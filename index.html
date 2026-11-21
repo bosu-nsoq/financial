@@ -375,6 +375,31 @@
     .popup-item-card.active .item-balance-text {
       color: #ffdeeb;
     }
+    .btn-action-icon {
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid rgba(0, 0, 0, 0.12);
+      border-radius: 9px;
+      padding: 4px 6px;
+      font-size: 13px;
+      line-height: 1;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .btn-action-icon:hover {
+      background: #fff;
+      transform: scale(1.08);
+    }
+    .btn-action-icon:active {
+      transform: scale(0.9);
+    }
+    .btn-delete-icon:hover {
+      background: #fee2e2;
+      border-color: #fca5a5;
+    }
 
     .transaction-item {
       background: rgba(255,255,255,0.7); 
@@ -901,7 +926,19 @@
   let selectedStudent = "";
   let checkSelectedCat = "";
 
-  const CACHE_KEY = "financial_dashboard_cache_v4";
+  const CACHE_KEY = "financial_dashboard_cache_v5";
+
+  function saveLocalState() {
+    const currentData = {
+      students: globalStudents,
+      categories: globalCategories,
+      balances: globalBalances,
+      recent: globalRecent
+    };
+    try {
+      localStorage.setItem(CACHE_KEY, JSON.stringify(currentData));
+    } catch(e) {}
+  }
 
   window.onload = function() {
     checkLockState();
@@ -1036,8 +1073,14 @@
         const isActive = (cat === selectedCategory) ? 'active' : '';
         html += `
           <div class="popup-item-card ${isActive}" onclick="selectCategoryFromModal('${cat}')">
-            <span style="font-weight:600;">📁 ${cat}</span>
-            <span style="font-size:16px; font-weight:700;">${isActive ? '✓' : ''}</span>
+            <div style="display:flex; align-items:center; gap:8px; overflow:hidden; flex:1;">
+              <span style="font-weight:600; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">📁 ${cat}</span>
+              ${isActive ? '<span style="font-weight:700; color:' + (isActive ? '#fff' : '#d63384') + '; font-size:16px;">✓</span>' : ''}
+            </div>
+            <div style="display:flex; align-items:center; gap:6px; flex-shrink:0;" onclick="event.stopPropagation()">
+              <button type="button" class="btn-action-icon" onclick="promptRenameCategory('${cat}')" title="เปลี่ยนชื่อ">✏️</button>
+              <button type="button" class="btn-action-icon btn-delete-icon" onclick="promptDeleteCategory('${cat}')" title="ลบ">🗑️</button>
+            </div>
           </div>`;
       });
       list.innerHTML = html;
@@ -1092,10 +1135,16 @@
       const bal = globalBalances[balKey] || 0;
       html += `
         <div class="popup-item-card ${isActive}" onclick="selectPersonFromModal('${s.name}')">
-          <span style="font-weight:600;">👤 ${s.name}</span>
-          <span class="item-balance-text" style="font-weight:700; font-size:13.5px; color:${isActive ? '#fff' : '#10ac84'};">
-            ${bal.toLocaleString()} ฿
-          </span>
+          <div style="display:flex; align-items:center; gap:8px; overflow:hidden; flex:1;">
+            <span style="font-weight:600; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">👤 ${s.name}</span>
+            <span class="item-balance-text" style="font-weight:700; font-size:13px; color:${isActive ? '#fff' : '#10ac84'}; white-space:nowrap;">
+              ${bal.toLocaleString()} ฿
+            </span>
+          </div>
+          <div style="display:flex; align-items:center; gap:6px; flex-shrink:0;" onclick="event.stopPropagation()">
+            <button type="button" class="btn-action-icon" onclick="promptRenameStudent('${s.name}')" title="เปลี่ยนชื่อ">✏️</button>
+            <button type="button" class="btn-action-icon btn-delete-icon" onclick="promptDeleteStudent('${s.name}')" title="ลบ">🗑️</button>
+          </div>
         </div>`;
     });
     list.innerHTML = html;
@@ -1266,59 +1315,395 @@
       return;
     }
 
-    showLoader(true);
-    google.script.run.withSuccessHandler(res => {
-      showLoader(false);
-      localStorage.setItem(CACHE_KEY, JSON.stringify(res));
-      updateUI(res);
-      document.getElementById('amountInput').value = '';
-      document.getElementById('remarkInput').value = '';
-      alert(`✅ บันทึกรายการ ${type} สำเร็จ!`);
-    }).addTransaction(student, category, type, amount, remark, chosenDate);
+    const numAmount = Number(amount);
+    const balKey = `${student} (${category})`;
+    if (!globalBalances[balKey]) globalBalances[balKey] = 0;
+
+    if (type === 'ฝาก') {
+      globalBalances[balKey] += numAmount;
+    } else {
+      globalBalances[balKey] -= numAmount;
+    }
+
+    const now = new Date();
+    const timeStr = `${String(now.getDate()).padStart(2,'0')}/${String(now.getMonth()+1).padStart(2,'0')}/${now.getFullYear()+543} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+
+    globalRecent.unshift({
+      id: String(Date.now()),
+      time: timeStr,
+      student: student,
+      category: category,
+      type: type,
+      amount: numAmount,
+      remark: remark || ''
+    });
+    globalRecent = globalRecent.slice(0, 10);
+
+    saveLocalState();
+    updateUI({
+      students: globalStudents,
+      categories: globalCategories,
+      balances: globalBalances,
+      recent: globalRecent
+    });
+
+    document.getElementById('amountInput').value = '';
+    document.getElementById('remarkInput').value = '';
+    alert(`✅ บันทึกรายการ ${type} สำเร็จ!`);
+
+    google.script.run
+      .withSuccessHandler(res => {
+        if (res && res.balances) {
+          localStorage.setItem(CACHE_KEY, JSON.stringify(res));
+          updateUI(res);
+        }
+      })
+      .withFailureHandler(err => {
+        console.warn("GAS sync warning:", err);
+      })
+      .addTransaction(student, category, type, amount, remark, chosenDate);
   }
 
   function deleteItem(id, fromHistoryModal = false) {
     if (confirm('❓ แน่ใจหรือไม่ว่าต้องการลบรายการนี้?')) {
+      const target = globalRecent.find(r => String(r.id) === String(id));
+      if (target) {
+        const balKey = `${target.student} (${target.category})`;
+        if (globalBalances[balKey] !== undefined) {
+          if (target.type === 'ฝาก' || target.type === 'รายรับ') {
+            globalBalances[balKey] -= target.amount;
+          } else {
+            globalBalances[balKey] += target.amount;
+          }
+        }
+      }
+      globalRecent = globalRecent.filter(r => String(r.id) !== String(id));
+      saveLocalState();
+      updateUI({
+        students: globalStudents,
+        categories: globalCategories,
+        balances: globalBalances,
+        recent: globalRecent
+      });
+      if (fromHistoryModal) closeModal('historyModal');
+
       showLoader(true);
-      google.script.run.withSuccessHandler(res => {
-        showLoader(false);
-        localStorage.setItem(CACHE_KEY, JSON.stringify(res));
-        updateUI(res);
-        if (fromHistoryModal) closeModal('historyModal'); 
-      }).deleteTransaction(id);
+      google.script.run
+        .withSuccessHandler(res => {
+          showLoader(false);
+          if (res && res.balances) {
+            localStorage.setItem(CACHE_KEY, JSON.stringify(res));
+            updateUI(res);
+          }
+        })
+        .withFailureHandler(err => {
+          showLoader(false);
+          console.warn("GAS delete error:", err);
+        })
+        .deleteTransaction(id);
     }
   }
 
+  // ==========================================
+  // จัดการหมวดหมู่ (เพิ่ม / เปลี่ยนชื่อ / ลบ)
+  // ==========================================
+  function promptAddCategory() {
+    const cat = prompt("กรอกชื่อหมวดหมู่ที่ต้องการเพิ่ม:");
+    if (!cat || !cat.trim()) return;
+    const trimmed = cat.trim();
+    if (globalCategories.includes(trimmed)) {
+      alert("มีหมวดหมู่นี้อยู่แล้วครับ");
+      return;
+    }
+
+    globalCategories.push(trimmed);
+    selectedCategory = trimmed;
+    saveLocalState();
+    updateUI({
+      students: globalStudents,
+      categories: globalCategories,
+      balances: globalBalances,
+      recent: globalRecent
+    });
+    openCategoryModal();
+
+    showLoader(true);
+    google.script.run
+      .withSuccessHandler(res => {
+        showLoader(false);
+        if (res && res.categories) {
+          localStorage.setItem(CACHE_KEY, JSON.stringify(res));
+          updateUI(res);
+          openCategoryModal();
+        }
+      })
+      .withFailureHandler(err => {
+        showLoader(false);
+        console.warn("GAS warning:", err);
+      })
+      .addCategory(trimmed);
+  }
+
+  function promptRenameCategory(oldCat) {
+    const newName = prompt("เปลี่ยนชื่อหมวดหมู่:", oldCat);
+    if (!newName || !newName.trim() || newName.trim() === oldCat) return;
+    const trimmedNew = newName.trim();
+    if (globalCategories.includes(trimmedNew)) {
+      alert("มีหมวดหมู่นี้อยู่แล้วครับ");
+      return;
+    }
+
+    const idx = globalCategories.indexOf(oldCat);
+    if (idx !== -1) globalCategories[idx] = trimmedNew;
+
+    globalStudents.forEach(s => {
+      if (s.category === oldCat) {
+        const oldKey = `${s.name} (${oldCat})`;
+        const newKey = `${s.name} (${trimmedNew})`;
+        if (globalBalances[oldKey] !== undefined) {
+          globalBalances[newKey] = globalBalances[oldKey];
+          delete globalBalances[oldKey];
+        }
+        s.category = trimmedNew;
+      }
+    });
+
+    globalRecent.forEach(r => {
+      if (r.category === oldCat) r.category = trimmedNew;
+    });
+
+    if (selectedCategory === oldCat) selectedCategory = trimmedNew;
+    if (checkSelectedCat === oldCat) checkSelectedCat = trimmedNew;
+
+    saveLocalState();
+    updateUI({
+      students: globalStudents,
+      categories: globalCategories,
+      balances: globalBalances,
+      recent: globalRecent
+    });
+    openCategoryModal();
+
+    showLoader(true);
+    google.script.run
+      .withSuccessHandler(res => {
+        showLoader(false);
+        if (res && res.categories) {
+          localStorage.setItem(CACHE_KEY, JSON.stringify(res));
+          updateUI(res);
+          openCategoryModal();
+        }
+      })
+      .withFailureHandler(err => {
+        showLoader(false);
+        console.warn("GAS warning:", err);
+      })
+      .renameCategory(oldCat, trimmedNew);
+  }
+
+  function promptDeleteCategory(cat) {
+    if (globalCategories.length <= 1) {
+      alert("ไม่สามารถลบได้ ต้องมีอย่างน้อย 1 หมวดหมู่ครับ");
+      return;
+    }
+    if (!confirm(`ยืนยันลบหมวดหมู่ "${cat}" หรือไม่?\n(ผู้ทำรายการและรายการทั้งหมดในหมวดนี้จะถูกลบด้วย)`)) {
+      return;
+    }
+
+    globalCategories = globalCategories.filter(c => c !== cat);
+    globalStudents = globalStudents.filter(s => s.category !== cat);
+
+    Object.keys(globalBalances).forEach(k => {
+      if (k.endsWith(`(${cat})`)) {
+        delete globalBalances[k];
+      }
+    });
+
+    globalRecent = globalRecent.filter(r => r.category !== cat);
+
+    if (selectedCategory === cat) {
+      selectedCategory = globalCategories[0] || "";
+      const filtered = globalStudents.filter(s => s.category === selectedCategory);
+      selectedStudent = filtered.length > 0 ? filtered[0].name : "";
+    }
+    if (checkSelectedCat === cat) {
+      checkSelectedCat = globalCategories[0] || "";
+    }
+
+    saveLocalState();
+    updateUI({
+      students: globalStudents,
+      categories: globalCategories,
+      balances: globalBalances,
+      recent: globalRecent
+    });
+    openCategoryModal();
+
+    showLoader(true);
+    google.script.run
+      .withSuccessHandler(res => {
+        showLoader(false);
+        if (res && res.categories) {
+          localStorage.setItem(CACHE_KEY, JSON.stringify(res));
+          updateUI(res);
+          openCategoryModal();
+        }
+      })
+      .withFailureHandler(err => {
+        showLoader(false);
+        console.warn("GAS warning:", err);
+      })
+      .deleteCategory(cat);
+  }
+
+  // ==========================================
+  // จัดการผู้ทำรายการ (เพิ่ม / เปลี่ยนชื่อ / ลบ)
+  // ==========================================
   function promptAddStudent() {
     if (!selectedCategory) {
       alert('⚠️ กรุณาเลือกหมวดหมู่ก่อน');
       return;
     }
-    const name = prompt(`กรอกชื่อผู้ทำรายการใหม่ ในหมวดหมู่ "${selectedCategory}":`);
-    if (name && name.trim()) { 
-      showLoader(true); 
-      google.script.run.withSuccessHandler(res => {
-        showLoader(false);
-        selectedStudent = name.trim();
-        localStorage.setItem(CACHE_KEY, JSON.stringify(res));
-        updateUI(res);
-        closeModal('personModal');
-      }).addStudent(name.trim(), selectedCategory); 
+    const name = prompt(`กรอกชื่อผู้ทำรายการใหม่ ในหมวด "${selectedCategory}":`);
+    if (!name || !name.trim()) return;
+    const trimmed = name.trim();
+    const exists = globalStudents.some(s => s.name === trimmed && s.category === selectedCategory);
+    if (exists) {
+      alert("มีชื่อผู้ทำรายการนี้ในหมวดหมู่นี้แล้วครับ");
+      return;
     }
+
+    globalStudents.push({ name: trimmed, category: selectedCategory });
+    globalBalances[`${trimmed} (${selectedCategory})`] = 0;
+    selectedStudent = trimmed;
+
+    saveLocalState();
+    updateUI({
+      students: globalStudents,
+      categories: globalCategories,
+      balances: globalBalances,
+      recent: globalRecent
+    });
+    const sInput = document.getElementById('personSearchInput');
+    filterPersonList(sInput ? sInput.value : '');
+
+    showLoader(true);
+    google.script.run
+      .withSuccessHandler(res => {
+        showLoader(false);
+        if (res && res.students) {
+          localStorage.setItem(CACHE_KEY, JSON.stringify(res));
+          updateUI(res);
+          const sInput = document.getElementById('personSearchInput');
+          filterPersonList(sInput ? sInput.value : '');
+        }
+      })
+      .withFailureHandler(err => {
+        showLoader(false);
+        console.warn("GAS warning:", err);
+      })
+      .addStudent(trimmed, selectedCategory);
   }
 
-  function promptAddCategory() {
-    const cat = prompt("กรอกชื่อหมวดหมู่ที่ต้องการเพิ่ม:");
-    if (cat && cat.trim()) { 
-      showLoader(true); 
-      google.script.run.withSuccessHandler(res => {
-        showLoader(false);
-        selectedCategory = cat.trim();
-        localStorage.setItem(CACHE_KEY, JSON.stringify(res));
-        updateUI(res);
-        closeModal('categoryModal');
-      }).addCategory(cat.trim()); 
+  function promptRenameStudent(oldName) {
+    const newName = prompt("เปลี่ยนชื่อผู้ทำรายการ:", oldName);
+    if (!newName || !newName.trim() || newName.trim() === oldName) return;
+    const trimmedNew = newName.trim();
+    const exists = globalStudents.some(s => s.name === trimmedNew && s.category === selectedCategory);
+    if (exists) {
+      alert("มีชื่อผู้ทำรายการนี้ในหมวดหมู่นี้แล้วครับ");
+      return;
     }
+
+    const target = globalStudents.find(s => s.name === oldName && s.category === selectedCategory);
+    if (target) target.name = trimmedNew;
+
+    const oldKey = `${oldName} (${selectedCategory})`;
+    const newKey = `${trimmedNew} (${selectedCategory})`;
+    if (globalBalances[oldKey] !== undefined) {
+      globalBalances[newKey] = globalBalances[oldKey];
+      delete globalBalances[oldKey];
+    }
+
+    globalRecent.forEach(r => {
+      if (r.student === oldName && r.category === selectedCategory) {
+        r.student = trimmedNew;
+      }
+    });
+
+    if (selectedStudent === oldName) {
+      selectedStudent = trimmedNew;
+    }
+
+    saveLocalState();
+    updateUI({
+      students: globalStudents,
+      categories: globalCategories,
+      balances: globalBalances,
+      recent: globalRecent
+    });
+    const sInput = document.getElementById('personSearchInput');
+    filterPersonList(sInput ? sInput.value : '');
+
+    showLoader(true);
+    google.script.run
+      .withSuccessHandler(res => {
+        showLoader(false);
+        if (res && res.students) {
+          localStorage.setItem(CACHE_KEY, JSON.stringify(res));
+          updateUI(res);
+          const sInput = document.getElementById('personSearchInput');
+          filterPersonList(sInput ? sInput.value : '');
+        }
+      })
+      .withFailureHandler(err => {
+        showLoader(false);
+        console.warn("GAS warning:", err);
+      })
+      .renameStudent(oldName, trimmedNew, selectedCategory);
+  }
+
+  function promptDeleteStudent(name) {
+    if (!confirm(`ยืนยันลบผู้ทำรายการ "${name}" ออกจากหมวดหมู่ "${selectedCategory}" หรือไม่?`)) {
+      return;
+    }
+
+    globalStudents = globalStudents.filter(s => !(s.name === name && s.category === selectedCategory));
+    delete globalBalances[`${name} (${selectedCategory})`];
+
+    globalRecent = globalRecent.filter(r => !(r.student === name && r.category === selectedCategory));
+
+    if (selectedStudent === name) {
+      const filtered = globalStudents.filter(s => s.category === selectedCategory);
+      selectedStudent = filtered.length > 0 ? filtered[0].name : "";
+    }
+
+    saveLocalState();
+    updateUI({
+      students: globalStudents,
+      categories: globalCategories,
+      balances: globalBalances,
+      recent: globalRecent
+    });
+    const sInput = document.getElementById('personSearchInput');
+    filterPersonList(sInput ? sInput.value : '');
+
+    showLoader(true);
+    google.script.run
+      .withSuccessHandler(res => {
+        showLoader(false);
+        if (res && res.students) {
+          localStorage.setItem(CACHE_KEY, JSON.stringify(res));
+          updateUI(res);
+          const sInput = document.getElementById('personSearchInput');
+          filterPersonList(sInput ? sInput.value : '');
+        }
+      })
+      .withFailureHandler(err => {
+        showLoader(false);
+        console.warn("GAS warning:", err);
+      })
+      .deleteStudent(name, selectedCategory);
   }
 
   // ==========================================
@@ -1386,7 +1771,7 @@
   // PWA Service Worker
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js?v=6').then(reg => {
+      navigator.serviceWorker.register('./sw.js?v=7').then(reg => {
         reg.update();
       }).catch(() => {});
     });

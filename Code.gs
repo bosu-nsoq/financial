@@ -362,3 +362,139 @@ function addCategory(name) {
   targetSheet.getRange(1, 2).setValue('ยอดเงินรวม (Total)');
   return getDashboardData();
 }
+
+// -----------------------------------------------------------------------------
+// 9. ลบหมวดหมู่
+// -----------------------------------------------------------------------------
+function deleteCategory(name) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const catSheet = ss.getSheetByName('Categories');
+  if (catSheet && catSheet.getLastRow() > 1) {
+    const data = catSheet.getRange(2, 1, catSheet.getLastRow() - 1, 1).getValues();
+    for (let i = data.length - 1; i >= 0; i--) {
+      if (String(data[i][0]).trim() === String(name).trim()) {
+        catSheet.deleteRow(i + 2);
+      }
+    }
+  }
+
+  const studentSheet = ss.getSheetByName('Students');
+  if (studentSheet && studentSheet.getLastRow() > 1) {
+    const sData = studentSheet.getRange(2, 1, studentSheet.getLastRow() - 1, 2).getValues();
+    for (let i = sData.length - 1; i >= 0; i--) {
+      if (String(sData[i][1]).trim() === String(name).trim()) {
+        studentSheet.deleteRow(i + 2);
+      }
+    }
+  }
+
+  const transSheet = ss.getSheetByName('Transactions');
+  if (transSheet && transSheet.getLastRow() > 1) {
+    const tData = transSheet.getRange(2, 1, transSheet.getLastRow() - 1, 4).getValues();
+    for (let i = tData.length - 1; i >= 0; i--) {
+      if (String(tData[i][3]).trim() === String(name).trim()) {
+        transSheet.deleteRow(i + 2);
+      }
+    }
+  }
+
+  syncBalancesToSheet();
+  return getDashboardData();
+}
+
+// -----------------------------------------------------------------------------
+// 10. เปลี่ยนชื่อหมวดหมู่
+// -----------------------------------------------------------------------------
+function renameCategory(oldName, newName) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const catSheet = ss.getSheetByName('Categories');
+  if (catSheet && catSheet.getLastRow() > 1) {
+    const data = catSheet.getRange(2, 1, catSheet.getLastRow() - 1, 1).getValues();
+    for (let i = 0; i < data.length; i++) {
+      if (String(data[i][0]).trim() === String(oldName).trim()) {
+        catSheet.getRange(i + 2, 1).setValue(newName.trim());
+      }
+    }
+  }
+
+  const studentSheet = ss.getSheetByName('Students');
+  if (studentSheet && studentSheet.getLastRow() > 1) {
+    const sData = studentSheet.getRange(2, 1, studentSheet.getLastRow() - 1, 2).getValues();
+    for (let i = 0; i < sData.length; i++) {
+      if (String(sData[i][1]).trim() === String(oldName).trim()) {
+        studentSheet.getRange(i + 2, 2).setValue(newName.trim());
+      }
+    }
+  }
+
+  const transSheet = ss.getSheetByName('Transactions');
+  if (transSheet && transSheet.getLastRow() > 1) {
+    const tData = transSheet.getRange(2, 1, transSheet.getLastRow() - 1, 4).getValues();
+    for (let i = 0; i < tData.length; i++) {
+      if (String(tData[i][3]).trim() === String(oldName).trim()) {
+        transSheet.getRange(i + 2, 4).setValue(newName.trim());
+      }
+    }
+  }
+
+  syncBalancesToSheet();
+  return getDashboardData();
+}
+
+// -----------------------------------------------------------------------------
+// 11. ลบผู้ทำรายการ / สมาชิก
+// -----------------------------------------------------------------------------
+function deleteStudent(name, category) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const studentSheet = ss.getSheetByName('Students');
+  if (studentSheet && studentSheet.getLastRow() > 1) {
+    const data = studentSheet.getRange(2, 1, studentSheet.getLastRow() - 1, 2).getValues();
+    for (let i = data.length - 1; i >= 0; i--) {
+      if (String(data[i][0]).trim() === String(name).trim() && String(data[i][1]).trim() === String(category).trim()) {
+        studentSheet.deleteRow(i + 2);
+      }
+    }
+  }
+
+  const transSheet = ss.getSheetByName('Transactions');
+  if (transSheet && transSheet.getLastRow() > 1) {
+    const tData = transSheet.getRange(2, 1, transSheet.getLastRow() - 1, 4).getValues();
+    for (let i = tData.length - 1; i >= 0; i--) {
+      if (String(tData[i][2]).trim() === String(name).trim() && String(tData[i][3]).trim() === String(category).trim()) {
+        transSheet.deleteRow(i + 2);
+      }
+    }
+  }
+
+  syncBalancesToSheet();
+  return getDashboardData();
+}
+
+// -----------------------------------------------------------------------------
+// 12. เปลี่ยนชื่อผู้ทำรายการ / สมาชิก
+// -----------------------------------------------------------------------------
+function renameStudent(oldName, newName, category) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const studentSheet = ss.getSheetByName('Students');
+  if (studentSheet && studentSheet.getLastRow() > 1) {
+    const data = studentSheet.getRange(2, 1, studentSheet.getLastRow() - 1, 2).getValues();
+    for (let i = 0; i < data.length; i++) {
+      if (String(data[i][0]).trim() === String(oldName).trim() && String(data[i][1]).trim() === String(category).trim()) {
+        studentSheet.getRange(i + 2, 1).setValue(newName.trim());
+      }
+    }
+  }
+
+  const transSheet = ss.getSheetByName('Transactions');
+  if (transSheet && transSheet.getLastRow() > 1) {
+    const tData = transSheet.getRange(2, 1, transSheet.getLastRow() - 1, 4).getValues();
+    for (let i = 0; i < tData.length; i++) {
+      if (String(tData[i][2]).trim() === String(oldName).trim() && String(tData[i][3]).trim() === String(category).trim()) {
+        transSheet.getRange(i + 2, 3).setValue(newName.trim());
+      }
+    }
+  }
+
+  syncBalancesToSheet();
+  return getDashboardData();
+}
