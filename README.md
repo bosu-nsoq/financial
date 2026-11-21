@@ -66,7 +66,7 @@ financial-tracker/
 cd financial-tracker
 
 # 2. ผูกกับ GitHub Repository ของคุณ (เปลี่ยน URL เป็นของท่าน)
-git remote add origin https://github.com/bosu-nsoq/<your-repo-name>.git
+git remote add origin https://github.com/bosu-nsoq/financial.git
 
 # 3. ตรวจสอบและ Push ขึ้น GitHub
 git branch -M main
