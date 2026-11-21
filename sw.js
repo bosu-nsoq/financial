@@ -1,5 +1,5 @@
 // Service Worker for Financial Tracker PWA
-const CACHE_NAME = 'financial-tracker-v2';
+const CACHE_NAME = 'financial-tracker-v3';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();

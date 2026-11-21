@@ -567,22 +567,6 @@
   <!-- ส่วนบันทึกรายการ (หน้าจอหลัก) -->
   <div class="glass">
     <h2>📝 บันทึกการเงิน</h2>
-
-    <!-- สรุปภาพรวมยอดเงินแบบเรียลไทม์ -->
-    <div class="summary-grid">
-      <div class="summary-card">
-        <div class="summary-label">รายรับรวม (ฝาก)</div>
-        <div class="summary-value val-income" id="dashTotalIncome">0 ฿</div>
-      </div>
-      <div class="summary-card">
-        <div class="summary-label">รายจ่ายรวม (ถอน)</div>
-        <div class="summary-value val-expense" id="dashTotalExpense">0 ฿</div>
-      </div>
-      <div class="summary-card">
-        <div class="summary-label">คงเหลือสุทธิ</div>
-        <div class="summary-value val-net" id="dashNetBalance">0 ฿</div>
-      </div>
-    </div>
     
     <!-- ช่องเลือกวันที่ พ.ศ. (แตะเลือกได้ทันที สะอาดตา) -->
     <div class="form-group">
@@ -626,8 +610,8 @@
     </div>
     
     <div class="action-row">
-      <button class="btn btn-deposit" onclick="submitTransaction('ฝาก')">+ ฝากเงิน (รายรับ)</button>
-      <button class="btn btn-withdraw" onclick="submitTransaction('ถอน')">- ถอนเงิน (รายจ่าย)</button>
+      <button class="btn btn-deposit" onclick="submitTransaction('ฝาก')">+ ฝากเงิน</button>
+      <button class="btn btn-withdraw" onclick="submitTransaction('ถอน')">- ถอนเงิน</button>
     </div>
   </div>
 
@@ -787,31 +771,26 @@
     }
   }
 
-  if (!window.google || !window.google.script || !window.google.script.run) {
-    window.google = window.google || {};
-    window.google.script = window.google.script || {};
-
-    function GasRunner(successFn, failureFn) {
-      this.successFn = successFn || function() {};
-      this.failureFn = failureFn || function(err) {
+  // สร้าง Proxy สำหรับ google.script.run ที่รองรับการ Chaining แบบสมบูรณ์ 100%
+  function createGasProxy(successFn, failureFn) {
+    const runner = {
+      successFn: successFn || function() {},
+      failureFn: failureFn || function(err) {
         console.error("GAS Request Error:", err);
         showLoader(false);
-        alert("❌ โหลดข้อมูลไม่สำเร็จ!\n\nสิ่งที่ต้องตรวจสอบใน Google Sheets:\n1. ไปที่ Apps Script > Deploy > Manage deployments\n2. ตั้ง Who has access เป็น 'Anyone' (ทุกคน)\n3. กด Run ฟังก์ชัน getDashboardData ใน Apps Script 1 ครั้งเพื่อกดยืนยันสิทธิ์ (Authorize)");
-      };
-    }
-
-    GasRunner.prototype.withSuccessHandler = function(fn) {
-      return new GasRunner(fn, this.failureFn);
+      },
+      withSuccessHandler: function(fn) {
+        return createGasProxy(fn, this.failureFn);
+      },
+      withFailureHandler: function(fn) {
+        return createGasProxy(this.successFn, fn);
+      }
     };
 
-    GasRunner.prototype.withFailureHandler = function(fn) {
-      return new GasRunner(this.successFn, fn);
-    };
-
-    window.google.script.run = new Proxy(new GasRunner(), {
+    return new Proxy(runner, {
       get: function(target, prop) {
-        if (prop === 'withSuccessHandler' || prop === 'withFailureHandler') {
-          return target[prop].bind(target);
+        if (prop in target) {
+          return target[prop];
         }
         return function(...args) {
           let apiUrl = getGasApiUrl();
@@ -819,30 +798,59 @@
             promptApiUrlSetting();
             apiUrl = getGasApiUrl();
             if (!apiUrl) {
+              showLoader(false);
               target.failureFn(new Error("Missing GAS API URL"));
               return;
             }
           }
 
-          fetch(apiUrl, {
-            method: "POST",
-            headers: { "Content-Type": "text/plain;charset=utf-8" },
-            body: JSON.stringify({ action: prop, args: args })
-          })
-          .then(res => res.json())
-          .then(data => {
-            if (data && data.error) {
-              target.failureFn(new Error(data.error));
-            } else {
-              target.successFn(data);
-            }
-          })
-          .catch(err => {
-            target.failureFn(err);
-          });
+          // พยายามยิงผ่าน GET ก่อนเพื่อความเร็วสูงสุด และหลีกเลี่ยง CORS / 302 Redirect issues บน GitHub Pages
+          const encodedArgs = encodeURIComponent(JSON.stringify(args));
+          const getUrl = `${apiUrl}?action=${encodeURIComponent(prop)}&args=${encodedArgs}`;
+
+          fetch(getUrl)
+            .then(res => {
+              if (!res.ok) throw new Error("HTTP " + res.status);
+              return res.json();
+            })
+            .then(data => {
+              showLoader(false);
+              if (data && data.error) {
+                target.failureFn(new Error(data.error));
+              } else {
+                target.successFn(data);
+              }
+            })
+            .catch(err => {
+              // หาก GET มีปัญหา ให้ fallback ไป POST
+              fetch(apiUrl, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify({ action: prop, args: args })
+              })
+              .then(res => res.json())
+              .then(data => {
+                showLoader(false);
+                if (data && data.error) {
+                  target.failureFn(new Error(data.error));
+                } else {
+                  target.successFn(data);
+                }
+              })
+              .catch(postErr => {
+                showLoader(false);
+                target.failureFn(postErr);
+              });
+            });
         };
       }
     });
+  }
+
+  if (!window.google || !window.google.script || !window.google.script.run) {
+    window.google = window.google || {};
+    window.google.script = window.google.script || {};
+    window.google.script.run = createGasProxy();
   }
 
   // ==========================================
@@ -869,12 +877,22 @@
     showLoader(true);
     google.script.run
       .withSuccessHandler(data => {
+        showLoader(false);
         if (data && data.categories) {
           localStorage.setItem(CACHE_KEY, JSON.stringify(data));
           updateUI(data);
         }
       })
+      .withFailureHandler(err => {
+        showLoader(false);
+        console.error("Dashboard load failed:", err);
+      })
       .getDashboardData();
+
+    // ตัวป้องกัน Loader ค้าง: บังคับปิด Loader หลังจาก 5 วินาทีเสมอ
+    setTimeout(() => {
+      showLoader(false);
+    }, 5000);
   };
 
   function loadCachedData() {
@@ -940,14 +958,17 @@
     globalCategories = data.categories || [];
     globalRecent = data.recent || [];
 
-    // อัปเดตการ์ดยอดรวมภาพรวม
+    // อัปเดตการ์ดยอดรวมภาพรวม (หากมี)
     const totalIncome = Number(data.totalIncome) || 0;
     const totalExpense = Number(data.totalExpense) || 0;
     const netBalance = Number(data.netBalance) || (totalIncome - totalExpense);
     
-    document.getElementById('dashTotalIncome').innerText = totalIncome.toLocaleString() + ' ฿';
-    document.getElementById('dashTotalExpense').innerText = totalExpense.toLocaleString() + ' ฿';
-    document.getElementById('dashNetBalance').innerText = netBalance.toLocaleString() + ' ฿';
+    const elIncome = document.getElementById('dashTotalIncome');
+    if (elIncome) elIncome.innerText = totalIncome.toLocaleString() + ' ฿';
+    const elExpense = document.getElementById('dashTotalExpense');
+    if (elExpense) elExpense.innerText = totalExpense.toLocaleString() + ' ฿';
+    const elNet = document.getElementById('dashNetBalance');
+    if (elNet) elNet.innerText = netBalance.toLocaleString() + ' ฿';
 
     // เรนเดอร์ปุ่มหมวดหมู่ (Chips)
     renderCategoryChips();
@@ -1203,7 +1224,7 @@
   // PWA Service Worker Registration & Auto-Update
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js?v=2').then(reg => {
+      navigator.serviceWorker.register('./sw.js?v=3').then(reg => {
         reg.update();
       }).catch(() => {});
     });
