@@ -8,7 +8,7 @@
   <!-- ชื่อบน Tab -->
   <title>Financial</title>
 
-  <!-- คำบรรยายและรูปภาพสำหรับแสดงผลเวลาแชร์ลิงก์ใน LINE / Facebook (Open Graph Meta Tags) -->
+  <!-- คำบรรยายและรูปภาพสำหรับแสดงผลเวลาแชร์ลิงก์ใน LINE / Facebook -->
   <meta name="description" content="ระบบบันทึกการใช้เงิน">
   <meta property="og:title" content="Financial">
   <meta property="og:description" content="ระบบบันทึกการใช้เงิน">
@@ -37,7 +37,7 @@
   <link rel="apple-touch-icon" sizes="167x167" href="https://i.postimg.cc/T2Cngdnd/Financial.png">
   <link rel="apple-touch-icon" sizes="180x180" href="https://i.postimg.cc/T2Cngdnd/Financial.png">
 
-  <!-- โหลดฟอนต์ Mali สำหรับ UI และ Sarabun สำหรับพิมพ์รายงาน -->
+  <!-- โหลดฟอนต์ Mali สำหรับ UI ระบบ และ Sarabun สำหรับพิมพ์เอกสารทางการ -->
   <link href="https://fonts.googleapis.com/css2?family=Mali:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
   <style>
@@ -53,7 +53,7 @@
       width: 100%;
       height: 100vh;
       height: 100dvh;
-      overflow: hidden; /* ล็อกหน้าจอแนวตั้งไม่ให้เลื่อนตามสั่ง */
+      overflow: hidden; /* บนมือถือล็อกหน้าจอแนวตั้งไม่ให้เลื่อน */
       background: linear-gradient(45deg, #FF9A9E, #FECFEF, #F6D365, #FDA085);
       background-size: 400% 400%;
       animation: gradientBG 15s ease infinite;
@@ -68,7 +68,7 @@
       100% { background-position: 0% 50%; }
     }
     
-    /* Layout Container ให้พอดีจอ 1 หน้าจอเต็ม */
+    /* Layout Container พอดีจอ */
     .app-container { 
       width: 100%; 
       max-width: 440px;
@@ -79,7 +79,7 @@
       padding: max(10px, env(safe-area-inset-top)) 10px max(10px, env(safe-area-inset-bottom)) 10px;
     }
 
-    /* Single-line Header เฉพาะหัวข้อ (เอาไอคอน 4 ปุ่มออกไปไว้ด้านล่างแล้ว) */
+    /* Single-line Header */
     .header-bar {
       display: flex;
       align-items: center;
@@ -107,15 +107,15 @@
       white-space: nowrap;
     }
 
-    /* การ์ดกระจกฝ้า Main Card */
+    /* ดีไซน์กระจกฝ้าแก้วโปร่งแสงระดับพรีเมียม (Ultra Glassmorphism) */
     .glass {
-      background: rgba(255, 255, 255, 0.45); 
-      backdrop-filter: blur(16px); 
-      -webkit-backdrop-filter: blur(16px);
-      border-radius: 18px; 
-      border: 1px solid rgba(255, 255, 255, 0.65);
-      box-shadow: 0 8px 30px 0 rgba(31, 38, 135, 0.12);
-      padding: 12px 14px; 
+      background: rgba(255, 255, 255, 0.28); 
+      backdrop-filter: blur(24px); 
+      -webkit-backdrop-filter: blur(24px);
+      border-radius: 20px; 
+      border: 1.5px solid rgba(255, 255, 255, 0.55);
+      box-shadow: 0 10px 32px 0 rgba(31, 38, 135, 0.12);
+      padding: 13px 14px; 
       flex: 1;
       display: flex;
       flex-direction: column;
@@ -124,7 +124,7 @@
       margin-bottom: 8px;
     }
 
-    /* Form Fields Styling */
+    /* Form Fields */
     .form-group { 
       margin-bottom: 5px; 
     }
@@ -140,78 +140,55 @@
       font-weight: 600; 
       color: #5a2e5d;
     }
-    
-    .btn-icon-mini {
-      background: rgba(255, 255, 255, 0.85);
-      border: 1px solid rgba(214, 51, 132, 0.3);
-      color: #d63384;
-      border-radius: 16px;
-      padding: 1px 8px;
-      font-size: 11px;
-      font-weight: 600;
-      cursor: pointer;
-      display: inline-flex;
+
+    /* กล่องเลือกแบบกดแล้วมีป๊อปอัพเด้ง (Glass Selector Box) สไตล์น่ารัก */
+    .glass-selector {
+      width: 100%;
+      padding: 9px 12px;
+      border-radius: 13px;
+      border: 1.5px solid rgba(255, 255, 255, 0.65);
+      background: rgba(255, 255, 255, 0.42);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      display: flex;
+      justify-content: space-between;
       align-items: center;
-      gap: 2px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
     }
-    .btn-icon-mini:active {
-      transform: scale(0.94);
-      background: #d63384;
-      color: white;
+    .glass-selector:active {
+      transform: scale(0.98);
+      background: rgba(255, 255, 255, 0.65);
     }
 
-    /* แถบปุ่ม Chips เลื่อนแนวนอนบรรทัดเดียว ไม่กินพื้นที่ */
-    .chips-container-row {
-      display: flex;
-      gap: 6px;
-      overflow-x: auto;
-      overflow-y: hidden;
-      white-space: nowrap;
-      padding: 2px 1px;
-      scrollbar-width: none; /* ซ่อน scrollbar */
-      -ms-overflow-style: none;
-    }
-    .chips-container-row::-webkit-scrollbar {
-      display: none;
-    }
-    .chip-btn {
-      padding: 6px 13px;
-      border-radius: 16px;
-      border: 1.5px solid rgba(255, 255, 255, 0.85);
-      background: rgba(255, 255, 255, 0.75);
-      color: #5a2e5d;
-      font-size: 12.5px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      flex-shrink: 0;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.03);
-    }
-    .chip-btn:active {
-      transform: scale(0.95);
-    }
-    .chip-btn.active {
-      background: #d63384;
-      color: #ffffff;
-      border-color: #d63384;
-      box-shadow: 0 3px 10px rgba(214, 51, 132, 0.35);
-      transform: scale(1.02);
+    /* ป้ายแสดงยอดเงินคงเหลือของผู้ทำรายการ */
+    .balance-tag {
+      background: rgba(29, 209, 161, 0.18);
+      color: #0b8e6d;
+      border: 1px solid rgba(29, 209, 161, 0.4);
+      padding: 1px 8px;
+      border-radius: 12px;
+      font-size: 11.5px;
+      font-weight: 700;
     }
 
     /* Inputs */
     input {
       width: 100%; 
-      padding: 8px 11px; 
-      border-radius: 11px; 
-      border: 1.5px solid rgba(255,255,255,0.7);
-      background: rgba(255,255,255,0.85); 
+      padding: 8px 12px; 
+      border-radius: 12px; 
+      border: 1.5px solid rgba(255,255,255,0.65);
+      background: rgba(255,255,255,0.42); 
+      backdrop-filter: blur(10px);
       font-size: 14.5px; 
       outline: none; 
       color: #333; 
       font-weight: 500;
+      transition: all 0.2s;
     }
     input:focus { 
-      background: #fff; 
+      background: rgba(255,255,255,0.85); 
       border-color: #ff6b6b; 
     }
 
@@ -238,7 +215,7 @@
     
     .btn {
       width: 100%; 
-      padding: 10px; 
+      padding: 11px; 
       border-radius: 12px; 
       border: none;
       font-size: 14.5px; 
@@ -263,14 +240,14 @@
     }
     .action-row { display: flex; gap: 8px; margin-top: 4px; }
 
-    /* แถบปุ่มด้านล่างสุด (Bottom Dock - ย้ายมาจากหัวเว็บ) */
+    /* แถบปุ่มด้านล่างสุด (Bottom Dock แก้วโปร่งแสง) */
     .bottom-dock {
-      background: rgba(255, 255, 255, 0.65);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border-radius: 16px;
-      border: 1px solid rgba(255, 255, 255, 0.8);
-      padding: 6px 12px;
+      background: rgba(255, 255, 255, 0.32);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      border-radius: 18px;
+      border: 1.5px solid rgba(255, 255, 255, 0.55);
+      padding: 6px 14px;
       display: flex;
       justify-content: space-around;
       align-items: center;
@@ -285,12 +262,12 @@
       align-items: center;
       gap: 2px;
       cursor: pointer;
-      padding: 4px 12px;
-      border-radius: 10px;
+      padding: 4px 14px;
+      border-radius: 12px;
       transition: background 0.15s;
     }
     .dock-btn:active {
-      background: rgba(255,255,255,0.8);
+      background: rgba(255,255,255,0.6);
       transform: scale(0.95);
     }
     .dock-icon {
@@ -315,44 +292,82 @@
       font-size: 12px;
     }
 
-    /* Modal Styling */
+    /* Modals แบบกระจกแก้วโปร่งแสง (Glass Popups) */
     .modal {
       display: none; 
       position: fixed; 
       z-index: 100; 
       left: 0; top: 0;
       width: 100%; height: 100%; 
-      background-color: rgba(0,0,0,0.45);
-      backdrop-filter: blur(6px); 
-      -webkit-backdrop-filter: blur(6px);
+      background-color: rgba(0,0,0,0.38);
+      backdrop-filter: blur(8px); 
+      -webkit-backdrop-filter: blur(8px);
       overflow-y: auto; 
       padding: 20px 10px;
     }
     .modal-content {
-      background: rgba(255, 255, 255, 0.85); 
-      backdrop-filter: blur(20px); 
-      -webkit-backdrop-filter: blur(20px);
-      border-radius: 20px; 
-      border: 1px solid rgba(255,255,255,0.9);
+      background: rgba(255, 255, 255, 0.58); 
+      backdrop-filter: blur(28px); 
+      -webkit-backdrop-filter: blur(28px);
+      border-radius: 24px; 
+      border: 1.5px solid rgba(255, 255, 255, 0.7);
       margin: 10px auto; 
       width: 100%; 
-      max-width: 440px; 
-      padding: 16px;
+      max-width: 420px; 
+      padding: 18px 16px;
       position: relative; 
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      box-shadow: 0 12px 35px rgba(31, 38, 135, 0.18);
     }
     .close-btn {
       position: absolute; right: 14px; top: 14px; 
       font-size: 24px; font-weight: bold;
       color: #ff6b6b; cursor: pointer; line-height: 1;
     }
+
+    /* รายการปุ่มใน Popup สไตล์การ์ดน่ารัก */
+    .popup-list-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      max-height: 250px;
+      overflow-y: auto;
+      padding: 4px 2px;
+      margin-top: 8px;
+    }
+    .popup-item-card {
+      background: rgba(255, 255, 255, 0.65);
+      border: 1.5px solid rgba(255, 255, 255, 0.85);
+      border-radius: 14px;
+      padding: 10px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    }
+    .popup-item-card:active {
+      transform: scale(0.97);
+      background: #d63384;
+      color: white;
+    }
+    .popup-item-card.active {
+      background: #d63384;
+      color: white;
+      border-color: #d63384;
+      box-shadow: 0 4px 12px rgba(214, 51, 132, 0.3);
+    }
+    .popup-item-card.active .item-balance-text {
+      color: #ffdeeb;
+    }
+
     .transaction-item {
-      background: rgba(255,255,255,0.85); 
-      border-radius: 11px; 
+      background: rgba(255,255,255,0.7); 
+      border-radius: 12px; 
       padding: 8px 10px; 
       margin-bottom: 8px;
       display: flex; justify-content: space-between; align-items: center; 
-      border: 1px solid rgba(255,255,255,0.9);
+      border: 1px solid rgba(255,255,255,0.85);
     }
     .t-info { font-size: 12px; color: #444; }
     .t-amount { font-weight: 700; font-size: 14.5px; }
@@ -360,9 +375,9 @@
     .t-withdraw { color: #ee5253; }
     .balance-box {
       display: flex; justify-content: space-between; align-items: center;
-      background: rgba(255,255,255,0.85); border-radius: 11px; 
-      padding: 8px 10px; margin-bottom: 7px;
-      border: 1px solid rgba(255,255,255,0.9);
+      background: rgba(255,255,255,0.7); border-radius: 12px; 
+      padding: 8px 11px; margin-bottom: 7px;
+      border: 1px solid rgba(255,255,255,0.85);
     }
     .balance-name { font-weight: 600; color: #5a2e5d; font-size: 13.5px; }
     .balance-amount { font-size: 14px; font-weight: bold; color: #d63384; margin: 0 8px; }
@@ -370,16 +385,17 @@
     /* ================= PIN LOCK SCREEN ================= */
     #pinOverlay {
       position: fixed; inset: 0; z-index: 9999;
-      background: linear-gradient(135deg, rgba(255,154,158,0.96), rgba(254,207,239,0.96));
-      backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px);
+      background: linear-gradient(135deg, rgba(255,154,158,0.92), rgba(254,207,239,0.92));
+      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       padding: 20px;
     }
     .pin-card {
-      background: rgba(255,255,255,0.7); border-radius: 24px;
+      background: rgba(255,255,255,0.55); border-radius: 24px;
+      backdrop-filter: blur(20px);
       padding: 24px 18px; width: 100%; max-width: 320px;
       box-shadow: 0 12px 36px rgba(0,0,0,0.12); text-align: center;
-      border: 1px solid rgba(255,255,255,0.85);
+      border: 1.5px solid rgba(255,255,255,0.75);
     }
     .pin-dot {
       width: 14px; height: 14px; border-radius: 50%;
@@ -393,31 +409,73 @@
     }
     .pin-key {
       aspect-ratio: 1; border-radius: 50%;
-      border: 1.5px solid rgba(255,255,255,0.85);
-      background: rgba(255,255,255,0.85); color: #5a2e5d;
+      border: 1.5px solid rgba(255,255,255,0.8);
+      background: rgba(255,255,255,0.65); color: #5a2e5d;
       font-size: 20px; font-weight: 700; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
     }
     .pin-key:active { transform: scale(0.9); background: #d63384; color: white; }
-    .pin-key.pin-tool { font-size: 15px; background: rgba(255,255,255,0.5); }
+    .pin-key.pin-tool { font-size: 15px; background: rgba(255,255,255,0.4); }
 
-    /* Print Styles (Sarabun font for official statistics) */
+    /* ================= จัดระยะห่างบนจอคอม (Desktop View) ให้สวยงาม ================= */
+    @media (min-width: 768px) {
+      html, body {
+        height: auto;
+        min-height: 100vh;
+        overflow-y: auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 30px 15px;
+      }
+      .app-container {
+        max-width: 460px;
+        height: auto;
+        margin: auto;
+        gap: 14px;
+      }
+      .glass {
+        padding: 24px 22px;
+        border-radius: 24px;
+        margin-bottom: 12px;
+        box-shadow: 0 16px 40px rgba(31, 38, 135, 0.14);
+      }
+      .form-group {
+        margin-bottom: 11px;
+      }
+      input, .glass-selector {
+        padding: 10px 13px;
+        font-size: 14.5px;
+      }
+      .btn {
+        padding: 12px;
+        font-size: 15px;
+      }
+      .bottom-dock {
+        padding: 8px 18px;
+        border-radius: 20px;
+      }
+    }
+
+    /* Print Styles (Sarabun font 100% สำหรับพิมพ์รายงานสถิติ) */
     @media print {
       body * { visibility: hidden !important; }
-      #printReportArea, #printReportArea * { visibility: visible !important; }
+      #printReportArea, #printReportArea * { 
+        visibility: visible !important; 
+        font-family: 'Sarabun', sans-serif !important;
+      }
       #printReportArea {
         position: fixed; left: 0; top: 0; width: 100%; height: 100%;
         background: white !important; color: black !important;
-        font-family: 'Sarabun', sans-serif !important;
-        padding: 20px; z-index: 999999;
+        padding: 25px; z-index: 999999;
       }
     }
   </style>
 </head>
 <body>
 
-<!-- พื้นที่สำหรับพิมพ์รายงานสถิติ (Sarabun) -->
+<!-- พื้นที่สำหรับพิมพ์รายงานสถิติ (ใช้ฟอนต์ Sarabun) -->
 <div id="printReportArea" style="display:none;"></div>
 
 <!-- ================= PIN LOCK OVERLAY ================= -->
@@ -453,7 +511,7 @@
 
 <div class="app-container">
   
-  <!-- Header Bar: หัวข้อแอป (ไม่มีไอคอน 4 ปุ่มแล้ว) -->
+  <!-- Header Bar -->
   <div class="header-bar">
     <div class="header-brand">
       <img src="https://i.postimg.cc/T2Cngdnd/Financial.png" alt="logo" class="header-logo">
@@ -463,34 +521,43 @@
 
   <div id="loader">✨ กำลังโหลดข้อมูล...</div>
 
-  <!-- ส่วนบันทึกรายการ (หน้าจอหลัก - พอดีจอ ไม่ต้องเลื่อน) -->
+  <!-- ส่วนบันทึกรายการ (หน้าจอหลัก - กระจกแก้วโปร่งแสง) -->
   <div class="glass">
     
-    <!-- ช่องเลือกวันที่ พ.ศ. -->
+    <!-- 1. วันที่ทำรายการ (เอาคำว่า พ.ศ. ออกตามคำสั่ง) -->
     <div class="form-group">
-      <label>📅 วันที่ทำรายการ (พ.ศ.)</label>
+      <label>📅 วันที่ทำรายการ</label>
       <div class="date-picker-wrap">
-        <input type="text" id="dateDisplay" readonly placeholder="วว/ดด/ปปปป" onclick="openDatePicker()" title="คลิกเพื่อเลือกวันที่" style="cursor:pointer; text-align:center; background:#ffffff; font-weight:600; color:#5a2e5d;">
+        <input type="text" id="dateDisplay" readonly placeholder="วว/ดด/ปปปป" onclick="openDatePicker()" title="คลิกเพื่อเลือกวันที่" style="cursor:pointer; text-align:center; font-weight:600; color:#5a2e5d;">
         <input type="date" id="dateRaw" onchange="onDateChange(this.value)">
       </div>
     </div>
 
-    <!-- ปุ่มเลือกหมวดหมู่ (แนวนอนบรรทัดเดียว) -->
+    <!-- 2. เลือกหมวดหมู่ (กดแล้วมีป๊อปอัพเด้งขึ้นมาเลือก) -->
     <div class="form-group">
-      <div class="field-header">
-        <label>📁 เลือกหมวดหมู่</label>
-        <button type="button" class="btn-icon-mini" onclick="promptAddCategory()">➕ เพิ่มหมวด</button>
+      <label>📁 เลือกหมวดหมู่</label>
+      <div class="glass-selector" onclick="openCategoryModal()">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:15px;">📂</span>
+          <span id="selectedCategoryDisplay" style="font-weight:600; color:#5a2e5d;">- แตะเพื่อเลือกหมวดหมู่ -</span>
+        </div>
+        <span style="font-size:11.5px; color:#d63384; font-weight:600;">แตะเลือก ▼</span>
       </div>
-      <div id="categoryChips" class="chips-container-row"></div>
     </div>
     
-    <!-- ปุ่มเลือกผู้ทำรายการ (แนวนอนบรรทัดเดียว) -->
+    <!-- 3. ผู้ทำรายการ (กดแล้วมีป๊อปอัพเด้งขึ้นมาเลือก พร้อมแสดงยอดคงเหลือ) -->
     <div class="form-group">
       <div class="field-header">
         <label>👤 ผู้ทำรายการ</label>
-        <button type="button" class="btn-icon-mini" onclick="promptAddStudent()">➕ เพิ่มคน</button>
+        <span id="personBalanceDisplay" class="balance-tag" style="display:none;"></span>
       </div>
-      <div id="studentChips" class="chips-container-row"></div>
+      <div class="glass-selector" onclick="openPersonModal()">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:15px;">👤</span>
+          <span id="selectedPersonDisplay" style="font-weight:600; color:#5a2e5d;">- แตะเพื่อเลือกผู้ทำรายการ -</span>
+        </div>
+        <span style="font-size:11.5px; color:#d63384; font-weight:600;">แตะเลือก ▼</span>
+      </div>
     </div>
     
     <div class="form-group">
@@ -509,7 +576,7 @@
     </div>
   </div>
 
-  <!-- แถบปุ่มด้านล่างสุด (ย้าย 3 ปุ่มลงมาที่นี่) -->
+  <!-- แถบปุ่มด้านล่างสุด (Bottom Dock) -->
   <div class="bottom-dock">
     <button class="dock-btn" onclick="openModal('balanceModal')">
       <span class="dock-icon">📊</span>
@@ -527,7 +594,32 @@
 
 </div>
 
-<!-- ================= MODALS ================= -->
+<!-- ================= POPUP MODALS ================= -->
+
+<!-- A. Modal ป๊อปอัพเลือกหมวดหมู่ สไตล์น่ารัก -->
+<div id="categoryModal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeModal('categoryModal')">&times;</span>
+    <h3 style="margin-bottom:6px;">📁 เลือกหมวดหมู่</h3>
+    <div id="categoryModalList" class="popup-list-grid"></div>
+    <button class="btn" onclick="promptAddCategory()" style="margin-top:12px; background:rgba(255,255,255,0.85); color:#d63384; border:1.5px solid #d63384; padding:8px; font-size:13px;">
+      ➕ เพิ่มหมวดหมู่ใหม่
+    </button>
+  </div>
+</div>
+
+<!-- B. Modal ป๊อปอัพเลือกผู้ทำรายการ พร้อมแสดงยอดคงเหลือรายคน -->
+<div id="personModal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeModal('personModal')">&times;</span>
+    <h3 style="margin-bottom:3px;">👤 เลือกผู้ทำรายการ</h3>
+    <div id="personModalSubtitle" style="text-align:center; font-size:12px; color:#666; margin-bottom:8px;"></div>
+    <div id="personModalList" class="popup-list-grid"></div>
+    <button class="btn" onclick="promptAddStudent()" style="margin-top:12px; background:rgba(255,255,255,0.85); color:#d63384; border:1.5px solid #d63384; padding:8px; font-size:13px;">
+      ➕ เพิ่มผู้ทำรายการใหม่
+    </button>
+  </div>
+</div>
 
 <!-- 1. Modal เช็คยอดคงเหลือ พร้อมปุ่มพิมพ์สถิติ -->
 <div id="balanceModal" class="modal">
@@ -536,15 +628,17 @@
     <h3 style="margin-bottom:8px;">📊 เช็คยอดคงเหลือ</h3>
     
     <div class="form-group">
-      <label>เลือกหมวดหมู่:</label>
-      <div id="checkCategoryChips" class="chips-container-row" style="margin-top:4px;"></div>
+      <label>หมวดหมู่ที่ต้องการดู:</label>
+      <div class="glass-selector" onclick="openCheckCatPicker()" style="margin-top:4px;">
+        <span id="checkCatDisplay" style="font-weight:600; color:#5a2e5d;">- เลือกหมวดหมู่ -</span>
+        <span style="font-size:11.5px; color:#d63384;">เปลี่ยน ▼</span>
+      </div>
     </div>
     
     <div id="balanceListResult" style="margin-top:10px; max-height:220px; overflow-y:auto;"></div>
 
-    <!-- ปุ่มพิมพ์สถิติประจำหมวดหมู่ -->
     <button class="btn" onclick="printCategoryStats()" style="margin-top:10px; background:#4facfe; color:white; font-size:13.5px; padding:9px;">
-      🖨️ พิมพ์รายงานสถิติหมวดหมู่นี้
+      🖨️ พิมพ์รายงานสถิติ (Sarabun)
     </button>
   </div>
 </div>
@@ -570,9 +664,7 @@
 
 <!-- ================= SCRIPTS ================= -->
 <script>
-  // ==========================================
-  // ข้อมูลตั้งต้นจริงจาก Google Sheets (โหลดทันที 0ms ไม่มีค้าง)
-  // ==========================================
+  // ข้อมูลตั้งต้นจริงจาก Google Sheets
   const INITIAL_REAL_DATA = {
     students: [
       {name:"มะนาว", category:"เงินทุน"},
@@ -693,7 +785,7 @@
   }
 
   // ==========================================
-  // 2. GAS API Bridge (URL ฝังถาวรในระบบ ไม่ต้องตั้งค่า)
+  // 2. GAS API Bridge
   // ==========================================
   const GAS_URL = "https://script.google.com/macros/s/AKfycbyE1fW25SF41sBaOCilsKbBA67LPtE588IU768FYpsoZtU2CW9MFnTDb22bM-CysyM_/exec";
 
@@ -701,7 +793,7 @@
     const runner = {
       successFn: successFn || function() {},
       failureFn: failureFn || function(err) {
-        console.warn("GAS Sync Warning:", err);
+        console.warn("GAS Warning:", err);
         showLoader(false);
       },
       withSuccessHandler: function(fn) {
@@ -776,18 +868,18 @@
   let selectedStudent = "";
   let checkSelectedCat = "";
 
-  const CACHE_KEY = "financial_dashboard_cache_v3";
+  const CACHE_KEY = "financial_dashboard_cache_v4";
 
   window.onload = function() {
     checkLockState();
     initDefaultDate();
     
-    // 1. โหลดข้อมูลแคชหรือข้อมูลเริ่มต้นทันที 0ms เพื่อให้กดเลือกหมวดหมู่ได้ทันที
+    // โหลดข้อมูลแคชหรือข้อมูลเริ่มต้นทันที 0ms
     const cached = localStorage.getItem(CACHE_KEY);
     const initialData = cached ? JSON.parse(cached) : INITIAL_REAL_DATA;
     updateUI(initialData);
 
-    // 2. ดึงข้อมูลสดจาก Google Sheets ในเบื้องหลัง
+    // ดึงข้อมูลสดจาก Google Sheets ในเบื้องหลัง
     google.script.run
       .withSuccessHandler(data => {
         showLoader(false);
@@ -850,95 +942,121 @@
     globalCategories = data.categories || [];
     globalRecent = data.recent || [];
 
-    renderCategoryChips();
-    renderCheckCategoryChips();
+    if (!selectedCategory || !globalCategories.includes(selectedCategory)) {
+      selectedCategory = globalCategories[0] || "";
+    }
+    document.getElementById('selectedCategoryDisplay').innerText = selectedCategory || "- แตะเพื่อเลือกหมวดหมู่ -";
+
+    const filtered = globalStudents.filter(s => s.category === selectedCategory);
+    const exists = filtered.some(s => s.name === selectedStudent);
+    if (!exists) {
+      selectedStudent = filtered.length > 0 ? filtered[0].name : "";
+    }
+    document.getElementById('selectedPersonDisplay').innerText = selectedStudent || "- แตะเพื่อเลือกผู้ทำรายการ -";
+
+    updateSelectedPersonBalance();
+
+    if (!checkSelectedCat || !globalCategories.includes(checkSelectedCat)) {
+      checkSelectedCat = globalCategories[0] || "";
+    }
+    document.getElementById('checkCatDisplay').innerText = checkSelectedCat || "- เลือกหมวดหมู่ -";
+    renderBalanceList();
+
     renderRecentTransactions(globalRecent);
   }
 
-  // เรนเดอร์ปุ่มหมวดหมู่ (Chips แนวนอน)
-  function renderCategoryChips() {
-    const container = document.getElementById('categoryChips');
-    if (!globalCategories || globalCategories.length === 0) {
-      container.innerHTML = '<div style="font-size:12px; color:#666;">ยังไม่มีหมวดหมู่</div>';
+  // อัปเดตแสดงยอดคงเหลือของผู้ทำรายการที่เลือก
+  function updateSelectedPersonBalance() {
+    const badge = document.getElementById('personBalanceDisplay');
+    if (!selectedStudent || !selectedCategory) {
+      badge.style.display = 'none';
       return;
     }
-
-    if (!selectedCategory || !globalCategories.includes(selectedCategory)) {
-      selectedCategory = globalCategories[0];
-    }
-
-    let html = '';
-    globalCategories.forEach(cat => {
-      const activeClass = (cat === selectedCategory) ? 'active' : '';
-      html += `<button type="button" class="chip-btn ${activeClass}" onclick="selectCategory('${cat}')">${cat}</button>`;
-    });
-    container.innerHTML = html;
-
-    renderStudentChips();
+    const balKey = `${selectedStudent} (${selectedCategory})`;
+    const bal = globalBalances[balKey] || 0;
+    badge.innerText = `คงเหลือ: ${bal.toLocaleString()} ฿`;
+    badge.style.display = 'inline-block';
   }
 
-  function selectCategory(cat) {
+  // ==========================================
+  // ป๊อปอัพเลือกหมวดหมู่ (Category Modal)
+  // ==========================================
+  function openCategoryModal() {
+    const list = document.getElementById('categoryModalList');
+    if (!globalCategories || globalCategories.length === 0) {
+      list.innerHTML = '<div style="text-align:center; padding:15px; color:#777;">ยังไม่มีหมวดหมู่</div>';
+    } else {
+      let html = '';
+      globalCategories.forEach(cat => {
+        const isActive = (cat === selectedCategory) ? 'active' : '';
+        html += `
+          <div class="popup-item-card ${isActive}" onclick="selectCategoryFromModal('${cat}')">
+            <span style="font-weight:600;">📁 ${cat}</span>
+            <span>${isActive ? '✓ เลือกอยู่' : 'แตะเลือก'}</span>
+          </div>`;
+      });
+      list.innerHTML = html;
+    }
+    openModal('categoryModal');
+  }
+
+  function selectCategoryFromModal(cat) {
     selectedCategory = cat;
-    renderCategoryChips();
+    document.getElementById('selectedCategoryDisplay').innerText = cat;
+    
+    // รีเซ็ตคนเป็นคนแรกของหมวดใหม่
+    const filtered = globalStudents.filter(s => s.category === cat);
+    selectedStudent = filtered.length > 0 ? filtered[0].name : "";
+    document.getElementById('selectedPersonDisplay').innerText = selectedStudent || "- แตะเพื่อเลือกผู้ทำรายการ -";
+    
+    updateSelectedPersonBalance();
+    closeModal('categoryModal');
   }
 
-  // เรนเดอร์ปุ่มผู้ทำรายการ (Chips แนวนอน)
-  function renderStudentChips() {
-    const container = document.getElementById('studentChips');
+  // ==========================================
+  // ป๊อปอัพเลือกผู้ทำรายการ พร้อมยอดคงเหลือ (Person Modal)
+  // ==========================================
+  function openPersonModal() {
     if (!selectedCategory) {
-      container.innerHTML = '<div style="font-size:12px; color:#777;">- กรุณาเลือกหมวดหมู่ก่อน -</div>';
+      alert("กรุณาเลือกหมวดหมู่ก่อนครับ");
       return;
     }
 
+    document.getElementById('personModalSubtitle').innerText = `หมวดหมู่: ${selectedCategory}`;
+    const list = document.getElementById('personModalList');
     const filtered = globalStudents.filter(s => s.category === selectedCategory);
+
     if (filtered.length === 0) {
-      container.innerHTML = '<div style="font-size:12px; color:#777;">ยังไม่มีผู้ทำรายการในหมวดนี้</div>';
-      selectedStudent = "";
-      return;
+      list.innerHTML = '<div style="text-align:center; padding:15px; color:#777;">ยังไม่มีผู้ทำรายการในหมวดนี้</div>';
+    } else {
+      let html = '';
+      filtered.forEach(s => {
+        const isActive = (s.name === selectedStudent) ? 'active' : '';
+        const balKey = `${s.name} (${selectedCategory})`;
+        const bal = globalBalances[balKey] || 0;
+        html += `
+          <div class="popup-item-card ${isActive}" onclick="selectPersonFromModal('${s.name}')">
+            <span style="font-weight:600;">👤 ${s.name}</span>
+            <span class="item-balance-text" style="font-weight:700; font-size:13px; color:#10ac84;">
+              ${bal.toLocaleString()} ฿
+            </span>
+          </div>`;
+      });
+      list.innerHTML = html;
     }
-
-    const exists = filtered.some(s => s.name === selectedStudent);
-    if (!exists) {
-      selectedStudent = filtered[0].name;
-    }
-
-    let html = '';
-    filtered.forEach(s => {
-      const activeClass = (s.name === selectedStudent) ? 'active' : '';
-      html += `<button type="button" class="chip-btn ${activeClass}" onclick="selectStudent('${s.name}')">${s.name}</button>`;
-    });
-    container.innerHTML = html;
+    openModal('personModal');
   }
 
-  function selectStudent(name) {
+  function selectPersonFromModal(name) {
     selectedStudent = name;
-    renderStudentChips();
+    document.getElementById('selectedPersonDisplay').innerText = name;
+    updateSelectedPersonBalance();
+    closeModal('personModal');
   }
 
-  // เรนเดอร์ Chips ใน Modal เช็คยอด
-  function renderCheckCategoryChips() {
-    const container = document.getElementById('checkCategoryChips');
-    if (!globalCategories || globalCategories.length === 0) {
-      container.innerHTML = '<div style="font-size:12px; color:#777;">ไม่มีหมวดหมู่</div>';
-      return;
-    }
-
-    if (!checkSelectedCat || !globalCategories.includes(checkSelectedCat)) {
-      checkSelectedCat = globalCategories[0];
-    }
-
-    let html = '';
-    globalCategories.forEach(cat => {
-      const activeClass = (cat === checkSelectedCat) ? 'active' : '';
-      html += `<button type="button" class="chip-btn ${activeClass}" onclick="selectCheckCategory('${cat}')">${cat}</button>`;
-    });
-    container.innerHTML = html;
-    renderBalanceList();
-  }
-
-  function selectCheckCategory(cat) {
-    checkSelectedCat = cat;
-    renderCheckCategoryChips();
+  // เลือกหมวดในหน้าเช็คยอด
+  function openCheckCatPicker() {
+    openCategoryModal(); // ใช้ร่วมกัน หรือเปลี่ยนตามต้องการ
   }
 
   function renderBalanceList() {
@@ -1038,7 +1156,7 @@
       return;
     }
     if (!student) {
-      alert('⚠️ กรุณาเลือกผู้ทำรายการ (หรือกด ➕ เพิ่มคน)');
+      alert('⚠️ กรุณาเลือกผู้ทำรายการ');
       return;
     }
     if (!amount || Number(amount) <= 0) {
@@ -1082,6 +1200,7 @@
         selectedStudent = name.trim();
         localStorage.setItem(CACHE_KEY, JSON.stringify(res));
         updateUI(res);
+        closeModal('personModal');
       }).addStudent(name.trim(), selectedCategory); 
     }
   }
@@ -1095,12 +1214,13 @@
         selectedCategory = cat.trim();
         localStorage.setItem(CACHE_KEY, JSON.stringify(res));
         updateUI(res);
+        closeModal('categoryModal');
       }).addCategory(cat.trim()); 
     }
   }
 
   // ==========================================
-  // 4. พิมพ์รายงานสถิติ (Sarabun Font)
+  // 4. พิมพ์รายงานสถิติ (Sarabun Font 100%)
   // ==========================================
   function printCategoryStats() {
     if (!checkSelectedCat) {
@@ -1119,37 +1239,37 @@
       totalCatBalance += bal;
       rowsHtml += `
         <tr>
-          <td style="border:1px solid #333; padding:8px; text-align:center;">${idx + 1}</td>
-          <td style="border:1px solid #333; padding:8px;">${s.name}</td>
-          <td style="border:1px solid #333; padding:8px; text-align:right;">${bal.toLocaleString()} บาท</td>
+          <td style="border:1px solid #333; padding:8px; text-align:center; font-family:'Sarabun', sans-serif;">${idx + 1}</td>
+          <td style="border:1px solid #333; padding:8px; font-family:'Sarabun', sans-serif;">${s.name}</td>
+          <td style="border:1px solid #333; padding:8px; text-align:right; font-family:'Sarabun', sans-serif;">${bal.toLocaleString()} บาท</td>
         </tr>`;
     });
 
     const reportHtml = `
-      <div style="font-family:'Sarabun', sans-serif; padding:10px; color:#000;">
-        <h2 style="text-align:center; margin:0 0 5px 0;">รายงานสถิติยอดเงินคงเหลือ</h2>
-        <h3 style="text-align:center; margin:0 0 15px 0; font-weight:normal;">หมวดหมู่: <strong>${checkSelectedCat}</strong> | ข้อมูล ณ วันที่: ${dateText}</h3>
-        <table style="width:100%; border-collapse:collapse; margin-bottom:15px; font-size:14px;">
+      <div style="font-family:'Sarabun', sans-serif !important; padding:15px; color:#000;">
+        <h2 style="text-align:center; margin:0 0 5px 0; font-family:'Sarabun', sans-serif; font-size:22px;">รายงานสถิติยอดเงินคงเหลือ</h2>
+        <h3 style="text-align:center; margin:0 0 15px 0; font-weight:normal; font-family:'Sarabun', sans-serif; font-size:16px;">หมวดหมู่: <strong>${checkSelectedCat}</strong> | ข้อมูล ณ วันที่: ${dateText}</h3>
+        <table style="width:100%; border-collapse:collapse; margin-bottom:15px; font-size:14px; font-family:'Sarabun', sans-serif;">
           <thead>
             <tr style="background:#f2f2f2;">
-              <th style="border:1px solid #333; padding:8px; width:60px;">ลำดับ</th>
-              <th style="border:1px solid #333; padding:8px; text-align:left;">ชื่อผู้ทำรายการ</th>
-              <th style="border:1px solid #333; padding:8px; text-align:right; width:150px;">ยอดเงินคงเหลือ</th>
+              <th style="border:1px solid #333; padding:8px; width:60px; font-family:'Sarabun', sans-serif;">ลำดับ</th>
+              <th style="border:1px solid #333; padding:8px; text-align:left; font-family:'Sarabun', sans-serif;">ชื่อผู้ทำรายการ</th>
+              <th style="border:1px solid #333; padding:8px; text-align:right; width:160px; font-family:'Sarabun', sans-serif;">ยอดเงินคงเหลือ</th>
             </tr>
           </thead>
           <tbody>
-            ${rowsHtml || '<tr><td colspan="3" style="text-align:center; padding:10px;">ไม่มีข้อมูล</td></tr>'}
+            ${rowsHtml || '<tr><td colspan="3" style="text-align:center; padding:10px; font-family:\'Sarabun\', sans-serif;">ไม่มีข้อมูล</td></tr>'}
           </tbody>
           <tfoot>
             <tr style="font-weight:bold; background:#fafafa;">
-              <td colspan="2" style="border:1px solid #333; padding:8px; text-align:right;">ยอดเงินรวมทั้งสิ้น:</td>
-              <td style="border:1px solid #333; padding:8px; text-align:right;">${totalCatBalance.toLocaleString()} บาท</td>
+              <td colspan="2" style="border:1px solid #333; padding:8px; text-align:right; font-family:'Sarabun', sans-serif;">ยอดเงินรวมทั้งสิ้น:</td>
+              <td style="border:1px solid #333; padding:8px; text-align:right; font-family:'Sarabun', sans-serif;">${totalCatBalance.toLocaleString()} บาท</td>
             </tr>
           </tfoot>
         </table>
-        <div style="text-align:right; font-size:12px; margin-top:30px;">
-          <p>ลงชื่อ .............................................................. ผู้จัดทำรายงาน</p>
-          <p>วันที่พิมพ์: ${dateText}</p>
+        <div style="text-align:right; font-size:13px; margin-top:35px; font-family:'Sarabun', sans-serif;">
+          <p style="margin:4px 0;">ลงชื่อ .............................................................. ผู้จัดทำรายงาน</p>
+          <p style="margin:4px 0;">วันที่พิมพ์: ${dateText}</p>
         </div>
       </div>
     `;
@@ -1164,7 +1284,7 @@
   // PWA Service Worker
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js?v=4').then(reg => {
+      navigator.serviceWorker.register('./sw.js?v=5').then(reg => {
         reg.update();
       }).catch(() => {});
     });
