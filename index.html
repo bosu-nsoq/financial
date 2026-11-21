@@ -26,13 +26,16 @@
   <link rel="icon" type="image/png" href="https://i.postimg.cc/T2Cngdnd/Financial.png">
   <link rel="shortcut icon" type="image/png" href="https://i.postimg.cc/T2Cngdnd/Financial.png">
 
-  <!-- PWA & iOS Web App Meta Tags -->
+  <!-- PWA & Apple iOS Standalone App Meta Tags -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#FF9A9E">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="Financial">
+  <meta name="apple-mobile-web-app-title" content="บันทึกการใช้เงิน">
   <link rel="apple-touch-icon" href="https://i.postimg.cc/T2Cngdnd/Financial.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="https://i.postimg.cc/T2Cngdnd/Financial.png">
+  <link rel="apple-touch-icon" sizes="167x167" href="https://i.postimg.cc/T2Cngdnd/Financial.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://i.postimg.cc/T2Cngdnd/Financial.png">
 
   <!-- โหลดฟอนต์ Mali จาก Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Mali:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -41,11 +44,15 @@
     * { 
       box-sizing: border-box; 
       font-family: 'Mali', cursive, sans-serif; 
+      -webkit-tap-highlight-color: transparent;
     }
     
     body {
       margin: 0; 
-      padding: 16px 10px;
+      padding-top: max(14px, env(safe-area-inset-top));
+      padding-bottom: max(20px, env(safe-area-inset-bottom));
+      padding-left: max(10px, env(safe-area-inset-left));
+      padding-right: max(10px, env(safe-area-inset-right));
       background: linear-gradient(45deg, #FF9A9E, #FECFEF, #F6D365, #FDA085);
       background-size: 400% 400%;
       animation: gradientBG 15s ease infinite;
@@ -63,37 +70,75 @@
     
     .app-container { 
       width: 100%; 
-      max-width: 450px; 
+      max-width: 440px; 
     }
 
     /* Single-line Responsive Header */
     .header-bar {
       display: flex;
       align-items: center;
-      justify-content: center;
+      justify-content: space-between;
       margin-bottom: 12px;
+      padding: 4px 6px;
+    }
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+    .header-logo {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+      flex-shrink: 0;
     }
     .header-title {
       margin: 0;
       color: #d63384;
-      font-size: 22px;
+      font-size: 19px;
       font-weight: 700;
       text-shadow: 1px 1px 3px rgba(255,255,255,0.9);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .header-icon-btn {
+      background: rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      border-radius: 50%;
+      width: 34px;
+      height: 34px;
+      cursor: pointer;
+      font-size: 15px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+      transition: transform 0.15s ease, background 0.2s;
+    }
+    .header-icon-btn:active {
+      transform: scale(0.92);
+      background: #fff;
+    }
+
     /* ดีไซน์กระจกฝ้า Glassmorphism */
     .glass {
       background: rgba(255, 255, 255, 0.45); 
       backdrop-filter: blur(16px); 
       -webkit-backdrop-filter: blur(16px);
       border-radius: 20px; 
-      border: 1px solid rgba(255, 255, 255, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.65);
       box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
-      padding: 18px; 
-      margin-bottom: 16px;
+      padding: 16px 14px; 
+      margin-bottom: 14px;
     }
     
     h2, h3 { 
@@ -107,26 +152,26 @@
     .summary-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      margin-bottom: 14px;
+      gap: 7px;
+      margin-bottom: 12px;
     }
     .summary-card {
-      background: rgba(255, 255, 255, 0.75);
+      background: rgba(255, 255, 255, 0.8);
       border-radius: 12px;
-      padding: 10px 4px;
+      padding: 8px 4px;
       text-align: center;
-      border: 1px solid rgba(255, 255, 255, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.9);
       box-shadow: 0 2px 6px rgba(0,0,0,0.04);
     }
     .summary-label {
-      font-size: 11px;
+      font-size: 10.5px;
       font-weight: 600;
       color: #666;
       margin-bottom: 2px;
       white-space: nowrap;
     }
     .summary-value {
-      font-size: 14.5px;
+      font-size: 13.5px;
       font-weight: 700;
       white-space: nowrap;
     }
@@ -134,31 +179,93 @@
     .val-expense { color: #ee5253; }
     .val-net { color: #5a2e5d; }
 
-    .form-group { margin-bottom: 13px; }
+    /* Form Fields & Label Styling */
+    .form-group { margin-bottom: 12px; }
+    .field-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 5px;
+    }
     label { 
-      display: block; 
-      margin-bottom: 5px; 
-      font-size: 14px; 
+      margin: 0;
+      font-size: 13.5px; 
       font-weight: 600; 
       color: #5a2e5d;
     }
     
-    select, input {
+    /* ปุ่มไอคอนเล็กๆ สำหรับเพิ่มหมวด / เพิ่มคน */
+    .btn-icon-mini {
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid rgba(214, 51, 132, 0.3);
+      color: #d63384;
+      border-radius: 20px;
+      padding: 2px 9px;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      transition: all 0.2s;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    }
+    .btn-icon-mini:active {
+      transform: scale(0.94);
+      background: #d63384;
+      color: white;
+    }
+
+    /* Chips Container สำหรับกดเลือกหมวดหมู่ / ผู้ทำรายการ แทน Dropdown */
+    .chips-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      max-height: 115px;
+      overflow-y: auto;
+      padding: 3px 1px;
+    }
+    .chip-btn {
+      padding: 7px 13px;
+      border-radius: 18px;
+      border: 1.5px solid rgba(255, 255, 255, 0.85);
+      background: rgba(255, 255, 255, 0.75);
+      color: #5a2e5d;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.04);
+      white-space: nowrap;
+    }
+    .chip-btn:active {
+      transform: scale(0.95);
+    }
+    .chip-btn.active {
+      background: #d63384;
+      color: #ffffff;
+      border-color: #d63384;
+      box-shadow: 0 4px 12px rgba(214, 51, 132, 0.35);
+      transform: scale(1.02);
+    }
+
+    /* Inputs */
+    input {
       width: 100%; 
-      padding: 12px; 
+      padding: 11px 13px; 
       border-radius: 12px; 
       border: 2px solid rgba(255,255,255,0.7);
       background: rgba(255,255,255,0.85); 
       font-size: 15px; 
       outline: none; 
-      transition: 0.3s;
+      transition: 0.25s;
       color: #333; 
       font-weight: 500;
     }
-    select:focus, input:focus { 
+    input:focus { 
       background: #fff; 
       border-color: #ff6b6b; 
-      box-shadow: 0 0 10px rgba(255,107,107,0.3);
+      box-shadow: 0 0 10px rgba(255,107,107,0.25);
     }
 
     /* Date Picker Overlay (No Cluttered Icon, 100% Direct Tap) */
@@ -194,7 +301,7 @@
       font-size: 15px; 
       font-weight: 700; 
       cursor: pointer; 
-      transition: 0.25s;
+      transition: 0.2s;
       display: flex; 
       justify-content: center; 
       align-items: center; 
@@ -211,22 +318,19 @@
       color: white; 
       box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4); 
     }
-    .btn-secondary { 
-      background: rgba(255,255,255,0.85); 
-      color: #5a2e5d; 
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06); 
-    }
     .btn-danger { 
       background: #ff4d4f; 
       color: white; 
-      padding: 6px 12px; 
-      font-size: 12px; 
+      padding: 5px 11px; 
+      font-size: 11.5px; 
       width: auto; 
       border-radius: 8px;
+      border: none;
+      cursor: pointer;
     }
     .btn-small { 
-      padding: 5px 10px; 
-      font-size: 12px; 
+      padding: 4px 10px; 
+      font-size: 11.5px; 
       background: #4facfe; 
       color: white; 
       border-radius: 8px; 
@@ -237,17 +341,17 @@
     }
     
     .transaction-item {
-      background: rgba(255,255,255,0.75); 
+      background: rgba(255,255,255,0.8); 
       border-radius: 12px; 
-      padding: 12px; 
-      margin-bottom: 10px;
+      padding: 10px 12px; 
+      margin-bottom: 9px;
       display: flex; 
       justify-content: space-between; 
       align-items: center; 
       border: 1px solid rgba(255,255,255,0.85);
     }
-    .t-info { font-size: 13px; color: #444; }
-    .t-amount { font-weight: 700; font-size: 16px; }
+    .t-info { font-size: 12.5px; color: #444; }
+    .t-amount { font-weight: 700; font-size: 15px; }
     .t-deposit { color: #10ac84; }
     .t-withdraw { color: #ee5253; }
     
@@ -259,7 +363,7 @@
       background: rgba(255,255,255,0.85); 
       border-radius: 12px; 
       padding: 10px 12px; 
-      margin-bottom: 9px;
+      margin-bottom: 8px;
       border: 1px solid rgba(255,255,255,0.9);
     }
     .balance-name { 
@@ -268,7 +372,7 @@
       white-space: nowrap; 
       overflow: hidden; 
       text-overflow: ellipsis; 
-      max-width: 130px; 
+      max-width: 140px; 
       text-align: left;
     }
     @media (min-width: 768px) {
@@ -278,7 +382,7 @@
       }
     }
     .balance-amount { 
-      font-size: 15px; 
+      font-size: 14.5px; 
       font-weight: bold; 
       color: #d63384; 
       flex-grow: 1; 
@@ -292,12 +396,12 @@
       font-weight: bold; 
       color: white; 
       margin-bottom: 12px; 
-      background: rgba(0,0,0,0.45); 
-      padding: 10px; 
+      background: rgba(0,0,0,0.5); 
+      padding: 9px; 
       border-radius: 12px;
-      font-size: 14px;
+      font-size: 13px;
     }
-    .action-row { display: flex; gap: 10px; margin-top: 5px; }
+    .action-row { display: flex; gap: 8px; margin-top: 4px; }
 
     /* Modal Styling */
     .modal {
@@ -309,56 +413,160 @@
       width: 100%; 
       height: 100%; 
       background-color: rgba(0,0,0,0.45);
-      backdrop-filter: blur(5px); 
-      -webkit-backdrop-filter: blur(5px);
+      backdrop-filter: blur(6px); 
+      -webkit-backdrop-filter: blur(6px);
       overflow-y: auto; 
       padding: 20px 10px;
     }
     .modal-content {
-      background: rgba(255, 255, 255, 0.7); 
+      background: rgba(255, 255, 255, 0.75); 
       backdrop-filter: blur(20px); 
       -webkit-backdrop-filter: blur(20px);
       border-radius: 20px; 
-      border: 1px solid rgba(255,255,255,0.8);
+      border: 1px solid rgba(255,255,255,0.85);
       margin: 10px auto; 
       width: 100%; 
-      max-width: 450px; 
-      padding: 20px;
+      max-width: 440px; 
+      padding: 18px;
       position: relative; 
       box-shadow: 0 10px 30px rgba(0,0,0,0.2);
     }
     .close-btn {
       position: absolute; 
-      right: 15px; 
-      top: 15px; 
-      font-size: 28px; 
+      right: 14px; 
+      top: 14px; 
+      font-size: 26px; 
       font-weight: bold;
       color: #ff6b6b; 
       cursor: pointer; 
       line-height: 1;
     }
+
+    /* ================= PIN LOCK SCREEN ================= */
+    #pinOverlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: linear-gradient(135deg, rgba(255,154,158,0.95), rgba(254,207,239,0.95));
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .pin-card {
+      background: rgba(255,255,255,0.7);
+      border-radius: 24px;
+      padding: 26px 20px;
+      width: 100%;
+      max-width: 330px;
+      box-shadow: 0 12px 36px rgba(0,0,0,0.12);
+      text-align: center;
+      border: 1px solid rgba(255,255,255,0.85);
+    }
+    .pin-dot {
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      border: 2px solid #d63384;
+      background: transparent;
+      transition: background 0.15s, transform 0.15s;
+    }
+    .pin-dot.filled {
+      background: #d63384;
+      transform: scale(1.15);
+    }
+    .pin-keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      max-width: 250px;
+      margin: 0 auto;
+    }
+    .pin-key {
+      aspect-ratio: 1;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255,255,255,0.85);
+      background: rgba(255,255,255,0.85);
+      color: #5a2e5d;
+      font-size: 21px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      transition: all 0.15s ease;
+    }
+    .pin-key:active {
+      transform: scale(0.9);
+      background: #d63384;
+      color: white;
+    }
+    .pin-key.pin-tool {
+      font-size: 16px;
+      background: rgba(255,255,255,0.5);
+    }
   </style>
 </head>
 <body>
 
+<!-- ================= PIN LOCK OVERLAY ================= -->
+<div id="pinOverlay">
+  <div class="pin-card">
+    <img src="https://i.postimg.cc/T2Cngdnd/Financial.png" alt="logo" style="width:68px; height:68px; border-radius:18px; margin-bottom:10px; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+    <h3 style="margin:0 0 5px 0; color:#d63384; font-size:19px;">ระบบบันทึกการใช้เงิน</h3>
+    <p id="pinMsg" style="margin:0 0 18px 0; color:#666; font-size:13.5px;">กรุณากรอกรหัส PIN 4 หลัก</p>
+    
+    <!-- Dots แสดงผล PIN -->
+    <div style="display:flex; justify-content:center; gap:16px; margin-bottom:22px;">
+      <span class="pin-dot" id="dot-0"></span>
+      <span class="pin-dot" id="dot-1"></span>
+      <span class="pin-dot" id="dot-2"></span>
+      <span class="pin-dot" id="dot-3"></span>
+    </div>
+    
+    <!-- Numeric Keypad -->
+    <div class="pin-keypad">
+      <button class="pin-key" onclick="pressPin('1')">1</button>
+      <button class="pin-key" onclick="pressPin('2')">2</button>
+      <button class="pin-key" onclick="pressPin('3')">3</button>
+      <button class="pin-key" onclick="pressPin('4')">4</button>
+      <button class="pin-key" onclick="pressPin('5')">5</button>
+      <button class="pin-key" onclick="pressPin('6')">6</button>
+      <button class="pin-key" onclick="pressPin('7')">7</button>
+      <button class="pin-key" onclick="pressPin('8')">8</button>
+      <button class="pin-key" onclick="pressPin('9')">9</button>
+      <button class="pin-key pin-tool" onclick="promptChangePin()" title="เปลี่ยนรหัส PIN">⚙️</button>
+      <button class="pin-key" onclick="pressPin('0')">0</button>
+      <button class="pin-key pin-tool" onclick="deletePin()">⌫</button>
+    </div>
+  </div>
+</div>
+
 <div class="app-container">
   
+  <!-- Header Bar -->
   <div class="header-bar">
-    <h1 class="header-title">💰 บันทึกรายรับ-รายจ่าย</h1>
-    <button onclick="promptApiUrlSetting()" title="ตั้งค่า Web App API URL" style="background:rgba(255,255,255,0.7); border:1px solid rgba(255,255,255,0.8); border-radius:50%; width:32px; height:32px; cursor:pointer; font-size:15px; margin-left:10px; display:inline-flex; align-items:center; justify-content:center; box-shadow:0 2px 5px rgba(0,0,0,0.05);">⚙️</button>
+    <div class="header-brand">
+      <img src="https://i.postimg.cc/T2Cngdnd/Financial.png" alt="logo" class="header-logo">
+      <h1 class="header-title">ระบบบันทึกการใช้เงิน</h1>
+    </div>
+    <div class="header-actions">
+      <button class="header-icon-btn" onclick="openModal('balanceModal')" title="เช็คยอดคงเหลือ">📊</button>
+      <button class="header-icon-btn" onclick="openModal('recentModal')" title="10 รายการล่าสุด">🕒</button>
+      <button class="header-icon-btn" onclick="promptApiUrlSetting()" title="ตั้งค่า Web App API URL">⚙️</button>
+      <button class="header-icon-btn" onclick="lockScreen()" title="ล็อคหน้าจอ">🔒</button>
+    </div>
   </div>
 
   <div id="loader">✨ กำลังโหลดข้อมูล...</div>
 
-  <!-- แถบเมนูสรุปยอดและประวัติ -->
-  <div class="action-row" style="margin-bottom: 14px;">
-    <button class="btn btn-secondary" onclick="openModal('balanceModal')">📊 เช็คยอดคงเหลือ</button>
-    <button class="btn btn-secondary" onclick="openModal('recentModal')">🕒 10 รายการล่าสุด</button>
-  </div>
-
   <!-- ส่วนบันทึกรายการ (หน้าจอหลัก) -->
   <div class="glass">
-    <h2>📝 บันทึกรายการเงิน</h2>
+    <h2>📝 บันทึกการเงิน</h2>
 
     <!-- สรุปภาพรวมยอดเงินแบบเรียลไทม์ -->
     <div class="summary-grid">
@@ -385,16 +593,26 @@
       </div>
     </div>
 
+    <!-- ปุ่มกดเลือกหมวดหมู่ (แทน Dropdown) -->
     <div class="form-group">
-      <label>📁 2. เลือกหมวดหมู่</label>
-      <select id="categorySelect" onchange="updateStudentDropdown()"></select>
+      <div class="field-header">
+        <label>📁 2. เลือกหมวดหมู่</label>
+        <button type="button" class="btn-icon-mini" onclick="promptAddCategory()">➕ เพิ่มหมวด</button>
+      </div>
+      <div id="categoryChips" class="chips-container">
+        <div style="font-size:12px; color:#777; padding:4px;">กำลังโหลดหมวดหมู่...</div>
+      </div>
     </div>
     
+    <!-- ปุ่มกดเลือกผู้ทำรายการ (แทน Dropdown) -->
     <div class="form-group">
-      <label>👤 3. ชื่อผู้ทำรายการ / นักเรียน</label>
-      <select id="studentSelect">
-        <option value="">- กรุณาเลือกหมวดหมู่ก่อน -</option>
-      </select>
+      <div class="field-header">
+        <label>👤 3. ผู้ทำรายการ</label>
+        <button type="button" class="btn-icon-mini" onclick="promptAddStudent()">➕ เพิ่มคน</button>
+      </div>
+      <div id="studentChips" class="chips-container">
+        <div style="font-size:12px; color:#777; padding:4px;">- กรุณาเลือกหมวดหมู่ก่อน -</div>
+      </div>
     </div>
     
     <div class="form-group">
@@ -404,20 +622,12 @@
     
     <div class="form-group">
       <label>💬 5. หมายเหตุ (ถ้ามี)</label>
-      <input type="text" id="remarkInput" placeholder="เช่น ค่าอาหาร, เงินฝากประจำวัน, ซื้ออุปกรณ์">
+      <input type="text" id="remarkInput" placeholder="เช่น ค่าอาหาร, ฝากเงิน, ซื้อของ">
     </div>
     
     <div class="action-row">
       <button class="btn btn-deposit" onclick="submitTransaction('ฝาก')">+ ฝากเงิน (รายรับ)</button>
       <button class="btn btn-withdraw" onclick="submitTransaction('ถอน')">- ถอนเงิน (รายจ่าย)</button>
-    </div>
-  </div>
-
-  <!-- ส่วนจัดการฐานข้อมูล -->
-  <div class="glass">
-    <div class="action-row">
-      <button class="btn btn-secondary" onclick="promptAddCategory()">➕ เพิ่มหมวดหมู่</button>
-      <button class="btn btn-secondary" onclick="promptAddStudent()">👤 เพิ่มชื่อสมาชิก/นักเรียน</button>
     </div>
   </div>
 
@@ -429,17 +639,15 @@
 <div id="balanceModal" class="modal">
   <div class="modal-content">
     <span class="close-btn" onclick="closeModal('balanceModal')">&times;</span>
-    <h3>📊 เช็คยอดรายบุคคล</h3>
+    <h3>📊 เช็คยอดคงเหลือผู้ทำรายการ</h3>
     
     <div class="form-group">
-      <label>เลือกหมวดหมู่ที่ต้องการดู:</label>
-      <select id="checkCategorySelect" onchange="renderBalanceList()">
-        <option value="">- เลือกหมวดหมู่ -</option>
-      </select>
+      <label>เลือกหมวดหมู่:</label>
+      <div id="checkCategoryChips" class="chips-container" style="max-height:90px; margin-top:5px;"></div>
     </div>
     
-    <div id="balanceListResult" style="margin-top:15px;">
-      <div style="text-align:center; color:#555;">กรุณาเลือกหมวดหมู่</div>
+    <div id="balanceListResult" style="margin-top:12px;">
+      <div style="text-align:center; color:#555; padding:10px;">กรุณาเลือกหมวดหมู่</div>
     </div>
   </div>
 </div>
@@ -457,8 +665,8 @@
 <div id="historyModal" class="modal" style="z-index: 105;">
   <div class="modal-content">
     <span class="close-btn" onclick="closeModal('historyModal')">&times;</span>
-    <h3 id="historyTitle" style="font-size:18px; margin-bottom:5px;">ประวัติ</h3>
-    <div style="text-align:center; color:#666; font-size:14px; margin-bottom:15px;" id="historySubtitle"></div>
+    <h3 id="historyTitle" style="font-size:17px; margin-bottom:4px;">ประวัติ</h3>
+    <div style="text-align:center; color:#666; font-size:13px; margin-bottom:12px;" id="historySubtitle"></div>
     <div id="historyListResult"></div>
   </div>
 </div>
@@ -466,7 +674,95 @@
 <!-- ================= SCRIPTS ================= -->
 <script>
   // ==========================================
-  // GAS API Bridge (รองรับทั้ง Google Apps Script และ GitHub Pages)
+  // 1. PIN LOCK SYSTEM (4 หลัก)
+  // ==========================================
+  let currentEnteredPin = "";
+  const PIN_STORAGE_KEY = 'financial_app_pin_v1';
+  const UNLOCKED_KEY = 'financial_app_unlocked';
+
+  function getSavedPin() {
+    return localStorage.getItem(PIN_STORAGE_KEY) || "1234";
+  }
+
+  function checkLockState() {
+    if (sessionStorage.getItem(UNLOCKED_KEY) === 'true') {
+      document.getElementById('pinOverlay').style.display = 'none';
+    } else {
+      document.getElementById('pinOverlay').style.display = 'flex';
+      currentEnteredPin = "";
+      updatePinDots();
+    }
+  }
+
+  function pressPin(num) {
+    if (currentEnteredPin.length < 4) {
+      currentEnteredPin += num;
+      updatePinDots();
+      if (currentEnteredPin.length === 4) {
+        setTimeout(verifyPin, 100);
+      }
+    }
+  }
+
+  function deletePin() {
+    if (currentEnteredPin.length > 0) {
+      currentEnteredPin = currentEnteredPin.slice(0, -1);
+      updatePinDots();
+    }
+  }
+
+  function updatePinDots() {
+    for (let i = 0; i < 4; i++) {
+      const dot = document.getElementById('dot-' + i);
+      if (i < currentEnteredPin.length) {
+        dot.classList.add('filled');
+      } else {
+        dot.classList.remove('filled');
+      }
+    }
+  }
+
+  function verifyPin() {
+    const correctPin = getSavedPin();
+    if (currentEnteredPin === correctPin) {
+      sessionStorage.setItem(UNLOCKED_KEY, 'true');
+      document.getElementById('pinOverlay').style.display = 'none';
+      currentEnteredPin = "";
+    } else {
+      const msg = document.getElementById('pinMsg');
+      msg.innerText = "❌ รหัส PIN ไม่ถูกต้อง ลองใหม่อีกครั้ง";
+      msg.style.color = "#ff4d4f";
+      currentEnteredPin = "";
+      updatePinDots();
+      setTimeout(() => {
+        msg.innerText = "กรุณากรอกรหัส PIN 4 หลัก";
+        msg.style.color = "#666";
+      }, 1500);
+    }
+  }
+
+  function promptChangePin() {
+    const oldPin = prompt("กรุณาระบุรหัส PIN ปัจจุบัน:");
+    if (oldPin === getSavedPin()) {
+      const newPin = prompt("กรุณากำหนดรหัส PIN 4 หลักใหม่ (เฉพาะตัวเลข):");
+      if (newPin && newPin.length === 4 && /^\d+$/.test(newPin)) {
+        localStorage.setItem(PIN_STORAGE_KEY, newPin);
+        alert("✅ เปลี่ยนรหัส PIN สำเร็จ!");
+      } else {
+        alert("⚠️ รหัส PIN ต้องเป็นตัวเลข 4 หลักเท่านั้น");
+      }
+    } else if (oldPin !== null) {
+      alert("❌ รหัส PIN เดิมไม่ถูกต้อง");
+    }
+  }
+
+  function lockScreen() {
+    sessionStorage.removeItem(UNLOCKED_KEY);
+    checkLockState();
+  }
+
+  // ==========================================
+  // 2. GAS API Bridge (สำหรับ GitHub Pages & Web App)
   // ==========================================
   const DEFAULT_GAS_URL = "https://script.google.com/macros/s/AKfycbyE1fW25SF41sBaOCilsKbBA67LPtE588IU768FYpsoZtU2CW9MFnTDb22bM-CysyM_/exec";
 
@@ -476,12 +772,12 @@
 
   function promptApiUrlSetting() {
     let current = getGasApiUrl();
-    let input = prompt("กรุณาระบุ Google Apps Script Web App URL (ที่ลงท้ายด้วย /exec):", current);
+    let input = prompt("⚙️ ตั้งค่า Google Apps Script Web App URL:\n(ต้องลงท้ายด้วย /exec และตั้งสิทธิ์ Anyone ใน Google Sheet)", current);
     if (input !== null) {
       input = input.trim();
       if (input) {
         localStorage.setItem('financial_gas_api_url', input);
-        alert("✅ บันทึก Web App URL เรียบร้อยแล้ว ระบบพร้อมทำงาน!");
+        alert("✅ บันทึก Web App URL เรียบร้อยแล้ว ระบบกำลังโหลดข้อมูลใหม่!");
         location.reload();
       } else {
         localStorage.removeItem('financial_gas_api_url');
@@ -491,7 +787,6 @@
     }
   }
 
-  // หากรันบน GitHub Pages (ไม่มี google.script.run natively) ให้จำลองด้วย Proxy Bridge
   if (!window.google || !window.google.script || !window.google.script.run) {
     window.google = window.google || {};
     window.google.script = window.google.script || {};
@@ -501,7 +796,7 @@
       this.failureFn = failureFn || function(err) {
         console.error("GAS Request Error:", err);
         showLoader(false);
-        alert("❌ ไม่สามารถติดต่อเซิร์ฟเวอร์ Google Apps Script ได้\nกรุณาตรวจสอบการตั้งค่า Web App URL (⚙️) หรือการอนุญาตสิทธิ์");
+        alert("❌ โหลดข้อมูลไม่สำเร็จ!\n\nสิ่งที่ต้องตรวจสอบใน Google Sheets:\n1. ไปที่ Apps Script > Deploy > Manage deployments\n2. ตั้ง Who has access เป็น 'Anyone' (ทุกคน)\n3. กด Run ฟังก์ชัน getDashboardData ใน Apps Script 1 ครั้งเพื่อกดยืนยันสิทธิ์ (Authorize)");
       };
     }
 
@@ -536,7 +831,11 @@
           })
           .then(res => res.json())
           .then(data => {
-            target.successFn(data);
+            if (data && data.error) {
+              target.failureFn(new Error(data.error));
+            } else {
+              target.successFn(data);
+            }
           })
           .catch(err => {
             target.failureFn(err);
@@ -546,21 +845,49 @@
     });
   }
 
+  // ==========================================
+  // 3. CACHE & UI RENDERING
+  // ==========================================
   let globalStudents = [];
   let globalBalances = {};
   let globalCategories = [];
   let globalRecent = [];
+  let selectedCategory = "";
+  let selectedStudent = "";
+  let checkSelectedCat = "";
 
-  // ตั้งค่าวันที่เริ่มต้นเป็น วันปัจจุบัน (พ.ศ.)
+  const CACHE_KEY = "financial_dashboard_cache_v2";
+
   window.onload = function() {
+    checkLockState();
     initDefaultDate();
+    
+    // โหลดข้อมูลจากแคชในเครื่องทันที 0ms เพื่อให้แอปเปิดเร็วที่สุด
+    loadCachedData();
+
+    // ดึงข้อมูลสดจาก Google Sheets ในเบื้องหลัง
     showLoader(true);
-    google.script.run.withSuccessHandler(updateUI).getDashboardData();
+    google.script.run
+      .withSuccessHandler(data => {
+        if (data && data.categories) {
+          localStorage.setItem(CACHE_KEY, JSON.stringify(data));
+          updateUI(data);
+        }
+      })
+      .getDashboardData();
   };
 
-  // -------------------------------------------------------------
+  function loadCachedData() {
+    try {
+      const cached = localStorage.getItem(CACHE_KEY);
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        updateUI(parsed);
+      }
+    } catch(e) {}
+  }
+
   // ระบบจัดการวันที่ พ.ศ. (dd/mm/yyyy)
-  // -------------------------------------------------------------
   function initDefaultDate() {
     const today = new Date();
     const yyyy = today.getFullYear();
@@ -606,6 +933,7 @@
   // -------------------------------------------------------------
   function updateUI(data) {
     showLoader(false);
+    if (!data) return;
     
     globalStudents = data.students || [];
     globalBalances = data.balances || {};
@@ -621,31 +949,136 @@
     document.getElementById('dashTotalExpense').innerText = totalExpense.toLocaleString() + ' ฿';
     document.getElementById('dashNetBalance').innerText = netBalance.toLocaleString() + ' ฿';
 
-    const oldCat = document.getElementById('categorySelect').value;
-    const oldStudent = document.getElementById('studentSelect').value;
-    const oldCheckCat = document.getElementById('checkCategorySelect').value;
+    // เรนเดอร์ปุ่มหมวดหมู่ (Chips)
+    renderCategoryChips();
 
-    let categoryHtml = '<option value="">- เลือกหมวดหมู่ -</option>';
-    data.categories.forEach(c => categoryHtml += `<option value="${c}">${c}</option>`);
-    
-    document.getElementById('categorySelect').innerHTML = categoryHtml;
-    document.getElementById('checkCategorySelect').innerHTML = categoryHtml;
-
-    if (oldCat) document.getElementById('categorySelect').value = oldCat;
-    updateStudentDropdown();
-    if (oldStudent) document.getElementById('studentSelect').value = oldStudent;
-    
-    if (oldCheckCat) {
-      document.getElementById('checkCategorySelect').value = oldCheckCat;
-      renderBalanceList(); 
-    }
+    // เรนเดอร์ปุ่มหมวดหมู่ใน Modal เช็คยอด
+    renderCheckCategoryChips();
 
     // เรนเดอร์ 10 รายการล่าสุด
+    renderRecentTransactions(globalRecent);
+  }
+
+  // เรนเดอร์ Category Chips
+  function renderCategoryChips() {
+    const container = document.getElementById('categoryChips');
+    if (globalCategories.length === 0) {
+      container.innerHTML = '<div style="font-size:12px; color:#666; padding:4px;">ยังไม่มีหมวดหมู่ (กดปุ่ม ➕ เพิ่มหมวด)</div>';
+      return;
+    }
+
+    if (!selectedCategory && globalCategories.length > 0) {
+      selectedCategory = globalCategories[0];
+    }
+
+    let html = '';
+    globalCategories.forEach(cat => {
+      const activeClass = (cat === selectedCategory) ? 'active' : '';
+      html += `<button type="button" class="chip-btn ${activeClass}" onclick="selectCategory('${cat}')">${cat}</button>`;
+    });
+    container.innerHTML = html;
+
+    renderStudentChips();
+  }
+
+  function selectCategory(cat) {
+    selectedCategory = cat;
+    renderCategoryChips();
+  }
+
+  // เรนเดอร์ Student / ผู้ทำรายการ Chips
+  function renderStudentChips() {
+    const container = document.getElementById('studentChips');
+    if (!selectedCategory) {
+      container.innerHTML = '<div style="font-size:12px; color:#777; padding:4px;">- กรุณาเลือกหมวดหมู่ก่อน -</div>';
+      return;
+    }
+
+    const filtered = globalStudents.filter(s => s.category === selectedCategory);
+    if (filtered.length === 0) {
+      container.innerHTML = '<div style="font-size:12px; color:#777; padding:4px;">ยังไม่มีผู้ทำรายการในหมวดนี้ (กดปุ่ม ➕ เพิ่มคน)</div>';
+      selectedStudent = "";
+      return;
+    }
+
+    // หากยังไม่ได้เลือก หรือคนที่เลือกไม่อยู่ในหมวดนี้ ให้เลือกคนแรกเป็นค่าเริ่มต้น
+    const exists = filtered.some(s => s.name === selectedStudent);
+    if (!exists) {
+      selectedStudent = filtered[0].name;
+    }
+
+    let html = '';
+    filtered.forEach(s => {
+      const activeClass = (s.name === selectedStudent) ? 'active' : '';
+      html += `<button type="button" class="chip-btn ${activeClass}" onclick="selectStudent('${s.name}')">${s.name}</button>`;
+    });
+    container.innerHTML = html;
+  }
+
+  function selectStudent(name) {
+    selectedStudent = name;
+    renderStudentChips();
+  }
+
+  // เรนเดอร์ Chips ใน Modal เช็คยอด
+  function renderCheckCategoryChips() {
+    const container = document.getElementById('checkCategoryChips');
+    if (globalCategories.length === 0) {
+      container.innerHTML = '<div style="font-size:12px; color:#777;">ไม่มีหมวดหมู่</div>';
+      return;
+    }
+
+    if (!checkSelectedCat && globalCategories.length > 0) {
+      checkSelectedCat = globalCategories[0];
+    }
+
+    let html = '';
+    globalCategories.forEach(cat => {
+      const activeClass = (cat === checkSelectedCat) ? 'active' : '';
+      html += `<button type="button" class="chip-btn ${activeClass}" onclick="selectCheckCategory('${cat}')">${cat}</button>`;
+    });
+    container.innerHTML = html;
+    renderBalanceList();
+  }
+
+  function selectCheckCategory(cat) {
+    checkSelectedCat = cat;
+    renderCheckCategoryChips();
+  }
+
+  function renderBalanceList() {
+    const resultDiv = document.getElementById('balanceListResult');
+    if (!checkSelectedCat) {
+      resultDiv.innerHTML = '<div style="text-align:center; color:#555; padding:10px;">กรุณาเลือกหมวดหมู่</div>';
+      return;
+    }
+
+    const studentsInCat = globalStudents.filter(s => s.category === checkSelectedCat);
+    if (studentsInCat.length === 0) {
+      resultDiv.innerHTML = '<div style="text-align:center; color:#555; padding:10px;">ไม่มีผู้ทำรายการในหมวดหมู่นี้</div>';
+      return;
+    }
+
+    let html = '';
+    studentsInCat.forEach(s => {
+      const balKey = `${s.name} (${checkSelectedCat})`;
+      const bal = globalBalances[balKey] || 0;
+      html += `
+        <div class="balance-box">
+          <div class="balance-name" title="${s.name}">${s.name}</div>
+          <div class="balance-amount">${bal.toLocaleString()} ฿</div>
+          <button class="btn btn-small" onclick="viewHistory('${s.name}', '${checkSelectedCat}')">📄 ประวัติ</button>
+        </div>`;
+    });
+    resultDiv.innerHTML = html;
+  }
+
+  function renderRecentTransactions(recent) {
     let recentHtml = '';
-    if (!data.recent || data.recent.length === 0) {
+    if (!recent || recent.length === 0) {
       recentHtml = '<div style="text-align:center; color:#666; padding:15px;">ยังไม่มีรายการบันทึก</div>';
     } else {
-      data.recent.forEach(r => {
+      recent.forEach(r => {
         const isDeposit = (r.type === 'ฝาก' || r.type === 'รายรับ');
         const colorClass = isDeposit ? 't-deposit' : 't-withdraw';
         const sign = isDeposit ? '+' : '-';
@@ -663,49 +1096,6 @@
       });
     }
     document.getElementById('recentTransactionsResult').innerHTML = recentHtml;
-  }
-
-  function updateStudentDropdown() {
-    const selectedCat = document.getElementById('categorySelect').value;
-    const studentSelect = document.getElementById('studentSelect');
-    let studentHtml = '<option value="">- เลือกชื่อผู้ทำรายการ -</option>';
-    
-    if (selectedCat) {
-      const filtered = globalStudents.filter(s => s.category === selectedCat);
-      filtered.forEach(s => studentHtml += `<option value="${s.name}">${s.name}</option>`);
-    } else {
-      studentHtml = '<option value="">- กรุณาเลือกหมวดหมู่ก่อน -</option>';
-    }
-    studentSelect.innerHTML = studentHtml;
-  }
-
-  function renderBalanceList() {
-    const cat = document.getElementById('checkCategorySelect').value;
-    const resultDiv = document.getElementById('balanceListResult');
-    
-    if (!cat) {
-      resultDiv.innerHTML = '<div style="text-align:center; color:#555;">กรุณาเลือกหมวดหมู่</div>';
-      return;
-    }
-
-    const studentsInCat = globalStudents.filter(s => s.category === cat);
-    if (studentsInCat.length === 0) {
-      resultDiv.innerHTML = '<div style="text-align:center; color:#555;">ไม่มีรายชื่อในหมวดหมู่นี้</div>';
-      return;
-    }
-
-    let html = '';
-    studentsInCat.forEach(s => {
-      const balKey = `${s.name} (${cat})`;
-      const bal = globalBalances[balKey] || 0;
-      html += `
-        <div class="balance-box">
-          <div class="balance-name" title="${s.name}">${s.name}</div>
-          <div class="balance-amount">${bal.toLocaleString()} ฿</div>
-          <button class="btn btn-small" onclick="viewHistory('${s.name}', '${cat}')">📄 ประวัติ</button>
-        </div>`;
-    });
-    resultDiv.innerHTML = html;
   }
 
   function viewHistory(studentName, category) {
@@ -742,19 +1132,28 @@
   }
 
   function submitTransaction(type) {
-    const category = document.getElementById('categorySelect').value;
-    const student = document.getElementById('studentSelect').value;
+    const category = selectedCategory;
+    const student = selectedStudent;
     const amount = document.getElementById('amountInput').value;
     const remark = document.getElementById('remarkInput').value;
-    const chosenDate = document.getElementById('dateRaw').value; // YYYY-MM-DD
+    const chosenDate = document.getElementById('dateRaw').value;
 
-    if (!category || !student || !amount || Number(amount) <= 0) {
-      alert('⚠️ กรุณากรอกข้อมูลให้ครบถ้วน และจำนวนเงินต้องมากกว่า 0');
+    if (!category) {
+      alert('⚠️ กรุณาเลือกหมวดหมู่');
+      return;
+    }
+    if (!student) {
+      alert('⚠️ กรุณาเลือกผู้ทำรายการ (หรือกดปุ่ม ➕ เพิ่มคน)');
+      return;
+    }
+    if (!amount || Number(amount) <= 0) {
+      alert('⚠️ กรุณาระบุจำนวนเงินให้ถูกต้อง (มากกว่า 0)');
       return;
     }
 
     showLoader(true);
     google.script.run.withSuccessHandler(res => {
+      localStorage.setItem(CACHE_KEY, JSON.stringify(res));
       updateUI(res);
       document.getElementById('amountInput').value = '';
       document.getElementById('remarkInput').value = '';
@@ -766,6 +1165,7 @@
     if (confirm('❓ แน่ใจหรือไม่ว่าต้องการลบรายการนี้? (ระบบจะคำนวณยอดเงินใหม่ให้อัตโนมัติ)')) {
       showLoader(true);
       google.script.run.withSuccessHandler(res => {
+        localStorage.setItem(CACHE_KEY, JSON.stringify(res));
         updateUI(res);
         if (fromHistoryModal) closeModal('historyModal'); 
       }).deleteTransaction(id);
@@ -773,15 +1173,18 @@
   }
 
   function promptAddStudent() {
-    const selectedCat = document.getElementById('categorySelect').value;
-    if (!selectedCat) {
-      alert('⚠️ กรุณาเลือก "หมวดหมู่" ที่ช่องด้านบนก่อน!');
+    if (!selectedCategory) {
+      alert('⚠️ กรุณาเลือก "หมวดหมู่" ก่อนทำการเพิ่มผู้ทำรายการ!');
       return;
     }
-    const name = prompt(`กรอกชื่อผู้ทำรายการ/นักเรียน ในหมวดหมู่ "${selectedCat}":`);
+    const name = prompt(`กรอกชื่อผู้ทำรายการใหม่ ในหมวดหมู่ "${selectedCategory}":`);
     if (name && name.trim()) { 
       showLoader(true); 
-      google.script.run.withSuccessHandler(updateUI).addStudent(name.trim(), selectedCat); 
+      google.script.run.withSuccessHandler(res => {
+        selectedStudent = name.trim();
+        localStorage.setItem(CACHE_KEY, JSON.stringify(res));
+        updateUI(res);
+      }).addStudent(name.trim(), selectedCategory); 
     }
   }
 
@@ -789,7 +1192,11 @@
     const cat = prompt("กรอกชื่อหมวดหมู่ที่ต้องการเพิ่ม:");
     if (cat && cat.trim()) { 
       showLoader(true); 
-      google.script.run.withSuccessHandler(updateUI).addCategory(cat.trim()); 
+      google.script.run.withSuccessHandler(res => {
+        selectedCategory = cat.trim();
+        localStorage.setItem(CACHE_KEY, JSON.stringify(res));
+        updateUI(res);
+      }).addCategory(cat.trim()); 
     }
   }
 

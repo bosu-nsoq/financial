@@ -340,7 +340,7 @@ function deleteTransaction(id) {
 }
 
 // -----------------------------------------------------------------------------
-// 7. เพิ่มนักเรียน / สมาชิก
+// 7. เพิ่มผู้ทำรายการ / สมาชิก
 // -----------------------------------------------------------------------------
 function addStudent(name, category) {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Students');
