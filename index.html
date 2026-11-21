@@ -119,26 +119,31 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      justify-content: space-around;
+      justify-content: flex-start;
+      gap: 9px;
       min-height: 0;
       margin-bottom: 8px;
     }
 
-    /* Form Fields */
+    /* Form Fields ปรับระยะห่างให้สวยงามพอดีจอแนวตั้ง */
     .form-group { 
-      margin-bottom: 5px; 
+      margin-bottom: 0; 
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
     }
     .field-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 3px;
+      margin-bottom: 1px;
     }
     label { 
       margin: 0;
       font-size: 13px; 
       font-weight: 600; 
       color: #5a2e5d;
+      line-height: 1.2;
     }
 
     /* กล่องเลือกแบบกดแล้วมีป๊อปอัพเด้ง (Glass Selector Box) สไตล์น่ารัก */
@@ -238,7 +243,7 @@
       color: white; 
       box-shadow: 0 3px 12px rgba(255, 107, 107, 0.35); 
     }
-    .action-row { display: flex; gap: 8px; margin-top: 4px; }
+    .action-row { display: flex; gap: 8px; margin-top: auto; padding-top: 3px; }
 
     /* แถบปุ่มด้านล่างสุด (Bottom Dock แก้วโปร่งแสง) */
     .bottom-dock {
@@ -292,59 +297,69 @@
       font-size: 12px;
     }
 
-    /* Modals แบบกระจกแก้วโปร่งแสง (Glass Popups) */
+    /* Modals แบบกระจกแก้วโปร่งแสง (Glass Popups) ขนาดใหญ่เต็มจอ สะดวกสบาย */
     .modal {
       display: none; 
       position: fixed; 
       z-index: 100; 
       left: 0; top: 0;
       width: 100%; height: 100%; 
-      background-color: rgba(0,0,0,0.38);
-      backdrop-filter: blur(8px); 
-      -webkit-backdrop-filter: blur(8px);
-      overflow-y: auto; 
-      padding: 20px 10px;
+      background-color: rgba(0,0,0,0.45);
+      backdrop-filter: blur(12px); 
+      -webkit-backdrop-filter: blur(12px);
+      padding: max(8px, env(safe-area-inset-top)) 8px max(8px, env(safe-area-inset-bottom)) 8px;
+      box-sizing: border-box;
+      overflow: hidden;
     }
     .modal-content {
-      background: rgba(255, 255, 255, 0.58); 
+      background: rgba(255, 255, 255, 0.78); 
       backdrop-filter: blur(28px); 
       -webkit-backdrop-filter: blur(28px);
       border-radius: 24px; 
-      border: 1.5px solid rgba(255, 255, 255, 0.7);
-      margin: 10px auto; 
+      border: 1.5px solid rgba(255, 255, 255, 0.85);
+      margin: 0 auto; 
       width: 100%; 
-      max-width: 420px; 
+      max-width: 440px; 
+      height: 94vh;
+      height: 94dvh;
+      max-height: 94dvh;
       padding: 18px 16px;
       position: relative; 
-      box-shadow: 0 12px 35px rgba(31, 38, 135, 0.18);
+      box-shadow: 0 16px 40px rgba(31, 38, 135, 0.22);
+      display: flex;
+      flex-direction: column;
+      box-sizing: border-box;
     }
     .close-btn {
       position: absolute; right: 14px; top: 14px; 
       font-size: 24px; font-weight: bold;
       color: #ff6b6b; cursor: pointer; line-height: 1;
+      padding: 4px;
     }
 
     /* รายการปุ่มใน Popup สไตล์การ์ดน่ารัก */
     .popup-list-grid {
       display: flex;
       flex-direction: column;
-      gap: 7px;
-      max-height: 250px;
+      gap: 8px;
+      flex: 1;
       overflow-y: auto;
       padding: 4px 2px;
-      margin-top: 8px;
+      margin-top: 6px;
+      -webkit-overflow-scrolling: touch;
     }
     .popup-item-card {
-      background: rgba(255, 255, 255, 0.65);
-      border: 1.5px solid rgba(255, 255, 255, 0.85);
+      background: rgba(255, 255, 255, 0.7);
+      border: 1.5px solid rgba(255, 255, 255, 0.9);
       border-radius: 14px;
-      padding: 10px 14px;
+      padding: 12px 14px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       cursor: pointer;
       transition: all 0.15s ease;
       box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+      font-size: 14.5px;
     }
     .popup-item-card:active {
       transform: scale(0.97);
@@ -440,9 +455,11 @@
         border-radius: 24px;
         margin-bottom: 12px;
         box-shadow: 0 16px 40px rgba(31, 38, 135, 0.14);
+        gap: 12px;
       }
       .form-group {
-        margin-bottom: 11px;
+        margin-bottom: 0;
+        gap: 5px;
       }
       input, .glass-selector {
         padding: 10px 13px;
@@ -455,6 +472,20 @@
       .bottom-dock {
         padding: 8px 18px;
         border-radius: 20px;
+      }
+      .modal {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+      }
+      .modal-content {
+        max-width: 480px;
+        height: auto;
+        max-height: 85vh;
+      }
+      .popup-list-grid, #balanceListResult, #recentTransactionsResult, #historyListResult {
+        max-height: 460px;
       }
     }
 
@@ -539,9 +570,9 @@
       <div class="glass-selector" onclick="openCategoryModal()">
         <div style="display:flex; align-items:center; gap:8px;">
           <span style="font-size:15px;">📂</span>
-          <span id="selectedCategoryDisplay" style="font-weight:600; color:#5a2e5d;">- แตะเพื่อเลือกหมวดหมู่ -</span>
+          <span id="selectedCategoryDisplay" style="font-weight:600; color:#5a2e5d;">- เลือกหมวดหมู่ -</span>
         </div>
-        <span style="font-size:11.5px; color:#d63384; font-weight:600;">แตะเลือก ▼</span>
+        <span style="font-size:12px; color:#d63384; font-weight:600;">▼</span>
       </div>
     </div>
     
@@ -554,9 +585,9 @@
       <div class="glass-selector" onclick="openPersonModal()">
         <div style="display:flex; align-items:center; gap:8px;">
           <span style="font-size:15px;">👤</span>
-          <span id="selectedPersonDisplay" style="font-weight:600; color:#5a2e5d;">- แตะเพื่อเลือกผู้ทำรายการ -</span>
+          <span id="selectedPersonDisplay" style="font-weight:600; color:#5a2e5d;">- เลือกผู้ทำรายการ -</span>
         </div>
-        <span style="font-size:11.5px; color:#d63384; font-weight:600;">แตะเลือก ▼</span>
+        <span style="font-size:12px; color:#d63384; font-weight:600;">▼</span>
       </div>
     </div>
     
@@ -578,7 +609,7 @@
 
   <!-- แถบปุ่มด้านล่างสุด (Bottom Dock) -->
   <div class="bottom-dock">
-    <button class="dock-btn" onclick="openModal('balanceModal')">
+    <button class="dock-btn" onclick="openBalanceModal()">
       <span class="dock-icon">📊</span>
       <span class="dock-label">เช็คยอด</span>
     </button>
@@ -596,64 +627,66 @@
 
 <!-- ================= POPUP MODALS ================= -->
 
-<!-- A. Modal ป๊อปอัพเลือกหมวดหมู่ สไตล์น่ารัก -->
-<div id="categoryModal" class="modal">
+<!-- A. Modal ป๊อปอัพเลือกหมวดหมู่ สไตล์น่ารัก เต็มจอใช้งานสะดวก -->
+<div id="categoryModal" class="modal" style="z-index: 200;">
   <div class="modal-content">
     <span class="close-btn" onclick="closeModal('categoryModal')">&times;</span>
     <h3 style="margin-bottom:6px;">📁 เลือกหมวดหมู่</h3>
     <div id="categoryModalList" class="popup-list-grid"></div>
-    <button class="btn" onclick="promptAddCategory()" style="margin-top:12px; background:rgba(255,255,255,0.85); color:#d63384; border:1.5px solid #d63384; padding:8px; font-size:13px;">
+    <button class="btn" onclick="promptAddCategory()" style="margin-top:10px; background:rgba(255,255,255,0.85); color:#d63384; border:1.5px solid #d63384; padding:9px; font-size:13px; flex-shrink:0;">
       ➕ เพิ่มหมวดหมู่ใหม่
     </button>
   </div>
 </div>
 
-<!-- B. Modal ป๊อปอัพเลือกผู้ทำรายการ พร้อมแสดงยอดคงเหลือรายคน -->
-<div id="personModal" class="modal">
+<!-- B. Modal ป๊อปอัพเลือกผู้ทำรายการ พร้อมแสดงยอดคงเหลือรายคน เต็มจอค้นหาสะดวก -->
+<div id="personModal" class="modal" style="z-index: 200;">
   <div class="modal-content">
     <span class="close-btn" onclick="closeModal('personModal')">&times;</span>
-    <h3 style="margin-bottom:3px;">👤 เลือกผู้ทำรายการ</h3>
-    <div id="personModalSubtitle" style="text-align:center; font-size:12px; color:#666; margin-bottom:8px;"></div>
+    <h3 style="margin-bottom:2px;">👤 เลือกผู้ทำรายการ</h3>
+    <div id="personModalSubtitle" style="text-align:center; font-size:12px; color:#666; margin-bottom:6px;"></div>
+    <input type="text" id="personSearchInput" placeholder="🔍 ค้นหาชื่อผู้ทำรายการ..." oninput="filterPersonList(this.value)" style="padding:8px 12px; margin-bottom:6px; font-size:13.5px; border-radius:12px; flex-shrink:0;">
     <div id="personModalList" class="popup-list-grid"></div>
-    <button class="btn" onclick="promptAddStudent()" style="margin-top:12px; background:rgba(255,255,255,0.85); color:#d63384; border:1.5px solid #d63384; padding:8px; font-size:13px;">
+    <button class="btn" onclick="promptAddStudent()" style="margin-top:10px; background:rgba(255,255,255,0.85); color:#d63384; border:1.5px solid #d63384; padding:9px; font-size:13px; flex-shrink:0;">
       ➕ เพิ่มผู้ทำรายการใหม่
     </button>
   </div>
 </div>
 
-<!-- 1. Modal เช็คยอดคงเหลือ พร้อมปุ่มพิมพ์สถิติ -->
-<div id="balanceModal" class="modal">
+<!-- 1. Modal เช็คยอดคงเหลือ พร้อมชิปเลือกหมวดหมู่และปุ่มพิมพ์สถิติ -->
+<div id="balanceModal" class="modal" style="z-index: 100;">
   <div class="modal-content">
     <span class="close-btn" onclick="closeModal('balanceModal')">&times;</span>
-    <h3 style="margin-bottom:8px;">📊 เช็คยอดคงเหลือ</h3>
+    <h3 style="margin-bottom:6px;">📊 เช็คยอดคงเหลือ</h3>
     
-    <div class="form-group">
-      <label>หมวดหมู่ที่ต้องการดู:</label>
-      <div class="glass-selector" onclick="openCheckCatPicker()" style="margin-top:4px;">
-        <span id="checkCatDisplay" style="font-weight:600; color:#5a2e5d;">- เลือกหมวดหมู่ -</span>
-        <span style="font-size:11.5px; color:#d63384;">เปลี่ยน ▼</span>
+    <div class="form-group" style="margin-bottom:8px; flex-shrink:0;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+        <label style="font-size:12.5px; font-weight:600; color:#5a2e5d;">📁 หมวดหมู่ที่ต้องการดู:</label>
+        <span id="checkCatDisplay" style="font-size:12.5px; font-weight:700; color:#d63384;">-</span>
       </div>
+      <!-- ชิปปุ่มเลือกหมวดหมู่ แตะเปลี่ยนได้ทันที และเลื่อนดูได้สะดวก -->
+      <div id="checkCatChipsRow" style="display:flex; gap:6px; overflow-x:auto; padding:3px 1px 6px 1px; scrollbar-width:none; -webkit-overflow-scrolling:touch;"></div>
     </div>
     
-    <div id="balanceListResult" style="margin-top:10px; max-height:220px; overflow-y:auto;"></div>
+    <div id="balanceListResult" style="flex:1; overflow-y:auto; margin-top:4px; padding-right:2px; min-height:0;"></div>
 
-    <button class="btn" onclick="printCategoryStats()" style="margin-top:10px; background:#4facfe; color:white; font-size:13.5px; padding:9px;">
-      🖨️ พิมพ์รายงานสถิติ (Sarabun)
+    <button class="btn" onclick="printCategoryStats()" style="margin-top:10px; background:#4facfe; color:white; font-size:13.5px; padding:10px; flex-shrink:0;">
+      🖨️ พิมพ์รายงานสถิติ
     </button>
   </div>
 </div>
 
 <!-- 2. Modal 10 รายการล่าสุด -->
-<div id="recentModal" class="modal">
+<div id="recentModal" class="modal" style="z-index: 100;">
   <div class="modal-content">
     <span class="close-btn" onclick="closeModal('recentModal')">&times;</span>
-    <h3>🕒 10 รายการล่าสุด</h3>
-    <div id="recentTransactionsResult" style="max-height:320px; overflow-y:auto;"></div>
+    <h3 style="margin-bottom:8px;">🕒 10 รายการล่าสุด</h3>
+    <div id="recentTransactionsResult" style="flex:1; overflow-y:auto; padding-right:2px; min-height:0;"></div>
   </div>
 </div>
 
 <!-- 3. Modal ประวัติรายบุคคล -->
-<div id="historyModal" class="modal" style="z-index: 105;">
+<div id="historyModal" class="modal" style="z-index: 350;">
   <div class="modal-content">
     <span class="close-btn" onclick="closeModal('historyModal')">&times;</span>
     <h3 id="historyTitle" style="font-size:17px; margin-bottom:4px;">ประวัติ</h3>
@@ -931,8 +964,18 @@
     document.getElementById('loader').style.display = show ? 'block' : 'none';
   }
 
-  function openModal(id) { document.getElementById(id).style.display = 'block'; }
-  function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+  function openModal(id) { 
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.style.display = 'flex';
+    el.style.flexDirection = 'column';
+    el.style.justifyContent = 'center';
+  }
+  function closeModal(id) { 
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.style.display = 'none'; 
+  }
 
   function updateUI(data) {
     if (!data) return;
@@ -945,21 +988,23 @@
     if (!selectedCategory || !globalCategories.includes(selectedCategory)) {
       selectedCategory = globalCategories[0] || "";
     }
-    document.getElementById('selectedCategoryDisplay').innerText = selectedCategory || "- แตะเพื่อเลือกหมวดหมู่ -";
+    document.getElementById('selectedCategoryDisplay').innerText = selectedCategory || "- เลือกหมวดหมู่ -";
 
     const filtered = globalStudents.filter(s => s.category === selectedCategory);
     const exists = filtered.some(s => s.name === selectedStudent);
     if (!exists) {
       selectedStudent = filtered.length > 0 ? filtered[0].name : "";
     }
-    document.getElementById('selectedPersonDisplay').innerText = selectedStudent || "- แตะเพื่อเลือกผู้ทำรายการ -";
+    document.getElementById('selectedPersonDisplay').innerText = selectedStudent || "- เลือกผู้ทำรายการ -";
 
     updateSelectedPersonBalance();
 
     if (!checkSelectedCat || !globalCategories.includes(checkSelectedCat)) {
-      checkSelectedCat = globalCategories[0] || "";
+      checkSelectedCat = selectedCategory || globalCategories[0] || "";
     }
-    document.getElementById('checkCatDisplay').innerText = checkSelectedCat || "- เลือกหมวดหมู่ -";
+    const checkDisp = document.getElementById('checkCatDisplay');
+    if (checkDisp) checkDisp.innerText = checkSelectedCat || "-";
+    renderCheckCatChips();
     renderBalanceList();
 
     renderRecentTransactions(globalRecent);
@@ -992,7 +1037,7 @@
         html += `
           <div class="popup-item-card ${isActive}" onclick="selectCategoryFromModal('${cat}')">
             <span style="font-weight:600;">📁 ${cat}</span>
-            <span>${isActive ? '✓ เลือกอยู่' : 'แตะเลือก'}</span>
+            <span style="font-size:16px; font-weight:700;">${isActive ? '✓' : ''}</span>
           </div>`;
       });
       list.innerHTML = html;
@@ -1007,7 +1052,7 @@
     // รีเซ็ตคนเป็นคนแรกของหมวดใหม่
     const filtered = globalStudents.filter(s => s.category === cat);
     selectedStudent = filtered.length > 0 ? filtered[0].name : "";
-    document.getElementById('selectedPersonDisplay').innerText = selectedStudent || "- แตะเพื่อเลือกผู้ทำรายการ -";
+    document.getElementById('selectedPersonDisplay').innerText = selectedStudent || "- เลือกผู้ทำรายการ -";
     
     updateSelectedPersonBalance();
     closeModal('categoryModal');
@@ -1023,28 +1068,37 @@
     }
 
     document.getElementById('personModalSubtitle').innerText = `หมวดหมู่: ${selectedCategory}`;
-    const list = document.getElementById('personModalList');
-    const filtered = globalStudents.filter(s => s.category === selectedCategory);
-
-    if (filtered.length === 0) {
-      list.innerHTML = '<div style="text-align:center; padding:15px; color:#777;">ยังไม่มีผู้ทำรายการในหมวดนี้</div>';
-    } else {
-      let html = '';
-      filtered.forEach(s => {
-        const isActive = (s.name === selectedStudent) ? 'active' : '';
-        const balKey = `${s.name} (${selectedCategory})`;
-        const bal = globalBalances[balKey] || 0;
-        html += `
-          <div class="popup-item-card ${isActive}" onclick="selectPersonFromModal('${s.name}')">
-            <span style="font-weight:600;">👤 ${s.name}</span>
-            <span class="item-balance-text" style="font-weight:700; font-size:13px; color:#10ac84;">
-              ${bal.toLocaleString()} ฿
-            </span>
-          </div>`;
-      });
-      list.innerHTML = html;
-    }
+    const sInput = document.getElementById('personSearchInput');
+    if (sInput) sInput.value = '';
+    filterPersonList('');
     openModal('personModal');
+  }
+
+  function filterPersonList(query) {
+    const q = (query || '').toLowerCase().trim();
+    const filtered = globalStudents.filter(s => s.category === selectedCategory);
+    const list = document.getElementById('personModalList');
+    if (!list) return;
+
+    const matched = filtered.filter(s => s.name.toLowerCase().includes(q));
+    if (matched.length === 0) {
+      list.innerHTML = '<div style="text-align:center; padding:15px; color:#777;">ไม่พบชื่อผู้ทำรายการ</div>';
+      return;
+    }
+    let html = '';
+    matched.forEach(s => {
+      const isActive = (s.name === selectedStudent) ? 'active' : '';
+      const balKey = `${s.name} (${selectedCategory})`;
+      const bal = globalBalances[balKey] || 0;
+      html += `
+        <div class="popup-item-card ${isActive}" onclick="selectPersonFromModal('${s.name}')">
+          <span style="font-weight:600;">👤 ${s.name}</span>
+          <span class="item-balance-text" style="font-weight:700; font-size:13.5px; color:${isActive ? '#fff' : '#10ac84'};">
+            ${bal.toLocaleString()} ฿
+          </span>
+        </div>`;
+    });
+    list.innerHTML = html;
   }
 
   function selectPersonFromModal(name) {
@@ -1054,9 +1108,57 @@
     closeModal('personModal');
   }
 
-  // เลือกหมวดในหน้าเช็คยอด
-  function openCheckCatPicker() {
-    openCategoryModal(); // ใช้ร่วมกัน หรือเปลี่ยนตามต้องการ
+  // ==========================================
+  // ระบบเช็คยอดคงเหลือ & เลือกหมวดหมู่ในหน้าเช็คยอด
+  // ==========================================
+  function openBalanceModal() {
+    if (!checkSelectedCat || !globalCategories.includes(checkSelectedCat)) {
+      checkSelectedCat = selectedCategory || globalCategories[0] || "";
+    }
+    const checkDisp = document.getElementById('checkCatDisplay');
+    if (checkDisp) checkDisp.innerText = checkSelectedCat || "-";
+    renderCheckCatChips();
+    renderBalanceList();
+    openModal('balanceModal');
+  }
+
+  function renderCheckCatChips() {
+    const container = document.getElementById('checkCatChipsRow');
+    if (!container) return;
+    if (!globalCategories || globalCategories.length === 0) {
+      container.innerHTML = '<span style="font-size:12px; color:#888;">ไม่มีหมวดหมู่</span>';
+      return;
+    }
+    let html = '';
+    globalCategories.forEach(cat => {
+      const isAct = (cat === checkSelectedCat);
+      html += `
+        <button type="button" onclick="selectCategoryForCheck('${cat}')" style="
+          padding: 6px 13px;
+          border-radius: 12px;
+          font-size: 12.5px;
+          font-weight: 600;
+          cursor: pointer;
+          white-space: nowrap;
+          border: ${isAct ? '1.5px solid #d63384' : '1px solid rgba(255,255,255,0.7)'};
+          background: ${isAct ? '#d63384' : 'rgba(255,255,255,0.65)'};
+          color: ${isAct ? '#fff' : '#5a2e5d'};
+          box-shadow: ${isAct ? '0 2px 8px rgba(214,51,132,0.3)' : '0 1px 4px rgba(0,0,0,0.03)'};
+          transition: all 0.15s ease;
+        ">
+          📁 ${cat}
+        </button>
+      `;
+    });
+    container.innerHTML = html;
+  }
+
+  function selectCategoryForCheck(cat) {
+    checkSelectedCat = cat;
+    const checkDisp = document.getElementById('checkCatDisplay');
+    if (checkDisp) checkDisp.innerText = cat;
+    renderCheckCatChips();
+    renderBalanceList();
   }
 
   function renderBalanceList() {
@@ -1284,7 +1386,7 @@
   // PWA Service Worker
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js?v=5').then(reg => {
+      navigator.serviceWorker.register('./sw.js?v=6').then(reg => {
         reg.update();
       }).catch(() => {});
     });
