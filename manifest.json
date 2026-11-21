@@ -1,7 +1,7 @@
 {
-  "name": "Financial - ระบบบันทึกการใช้งาน",
+  "name": "Financial - ระบบบันทึกการใช้เงิน",
   "short_name": "Financial",
-  "description": "ระบบบันทึกการใช้งาน",
+  "description": "ระบบบันทึกการใช้เงิน",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

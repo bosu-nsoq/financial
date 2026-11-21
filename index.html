@@ -9,9 +9,9 @@
   <title>Financial</title>
 
   <!-- คำบรรยายและรูปภาพสำหรับแสดงผลเวลาแชร์ลิงก์ใน LINE / Facebook (Open Graph Meta Tags) -->
-  <meta name="description" content="ระบบบันทึกการใช้งาน">
+  <meta name="description" content="ระบบบันทึกการใช้เงิน">
   <meta property="og:title" content="Financial">
-  <meta property="og:description" content="ระบบบันทึกการใช้งาน">
+  <meta property="og:description" content="ระบบบันทึกการใช้เงิน">
   <meta property="og:image" content="https://i.postimg.cc/T2Cngdnd/Financial.png">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://bosu-nsoq.github.io/financial/">
@@ -19,7 +19,7 @@
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="Financial">
-  <meta name="twitter:description" content="ระบบบันทึกการใช้งาน">
+  <meta name="twitter:description" content="ระบบบันทึกการใช้เงิน">
   <meta name="twitter:image" content="https://i.postimg.cc/T2Cngdnd/Financial.png">
 
   <!-- Favicon (ไอคอนบน Tab) -->
@@ -37,8 +37,8 @@
   <link rel="apple-touch-icon" sizes="167x167" href="https://i.postimg.cc/T2Cngdnd/Financial.png">
   <link rel="apple-touch-icon" sizes="180x180" href="https://i.postimg.cc/T2Cngdnd/Financial.png">
 
-  <!-- โหลดฟอนต์ Mali จาก Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Mali:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- โหลดฟอนต์ Mali สำหรับ UI และ Sarabun สำหรับพิมพ์รายงาน -->
+  <link href="https://fonts.googleapis.com/css2?family=Mali:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
   <style>
     * { 
@@ -47,16 +47,16 @@
       -webkit-tap-highlight-color: transparent;
     }
     
-    body {
+    html, body {
       margin: 0; 
-      padding-top: max(14px, env(safe-area-inset-top));
-      padding-bottom: max(20px, env(safe-area-inset-bottom));
-      padding-left: max(10px, env(safe-area-inset-left));
-      padding-right: max(10px, env(safe-area-inset-right));
+      padding: 0;
+      width: 100%;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden; /* ล็อกหน้าจอแนวตั้งไม่ให้เลื่อนตามสั่ง */
       background: linear-gradient(45deg, #FF9A9E, #FECFEF, #F6D365, #FDA085);
       background-size: 400% 400%;
       animation: gradientBG 15s ease infinite;
-      min-height: 100vh; 
       display: flex; 
       justify-content: center; 
       color: #333;
@@ -68,31 +68,35 @@
       100% { background-position: 0% 50%; }
     }
     
+    /* Layout Container ให้พอดีจอ 1 หน้าจอเต็ม */
     .app-container { 
       width: 100%; 
-      max-width: 440px; 
+      max-width: 440px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: max(10px, env(safe-area-inset-top)) 10px max(10px, env(safe-area-inset-bottom)) 10px;
     }
 
-    /* Single-line Responsive Header */
+    /* Single-line Header เฉพาะหัวข้อ (เอาไอคอน 4 ปุ่มออกไปไว้ด้านล่างแล้ว) */
     .header-bar {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      margin-bottom: 12px;
-      padding: 4px 6px;
+      justify-content: center;
+      padding: 4px 0 6px 0;
+      flex-shrink: 0;
     }
     .header-brand {
       display: flex;
       align-items: center;
       gap: 8px;
-      min-width: 0;
     }
     .header-logo {
-      width: 34px;
-      height: 34px;
-      border-radius: 10px;
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.12);
-      flex-shrink: 0;
     }
     .header-title {
       margin: 0;
@@ -101,114 +105,54 @@
       font-weight: 700;
       text-shadow: 1px 1px 3px rgba(255,255,255,0.9);
       white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      flex-shrink: 0;
-    }
-    .header-icon-btn {
-      background: rgba(255, 255, 255, 0.8);
-      border: 1px solid rgba(255, 255, 255, 0.9);
-      border-radius: 50%;
-      width: 34px;
-      height: 34px;
-      cursor: pointer;
-      font-size: 15px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-      transition: transform 0.15s ease, background 0.2s;
-    }
-    .header-icon-btn:active {
-      transform: scale(0.92);
-      background: #fff;
     }
 
-    /* ดีไซน์กระจกฝ้า Glassmorphism */
+    /* การ์ดกระจกฝ้า Main Card */
     .glass {
       background: rgba(255, 255, 255, 0.45); 
       backdrop-filter: blur(16px); 
       -webkit-backdrop-filter: blur(16px);
-      border-radius: 20px; 
+      border-radius: 18px; 
       border: 1px solid rgba(255, 255, 255, 0.65);
-      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
-      padding: 16px 14px; 
-      margin-bottom: 14px;
+      box-shadow: 0 8px 30px 0 rgba(31, 38, 135, 0.12);
+      padding: 12px 14px; 
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      min-height: 0;
+      margin-bottom: 8px;
     }
-    
-    h2, h3 { 
-      margin-top: 0; 
-      color: #d63384; 
-      text-align: center; 
-      text-shadow: 1px 1px 2px rgba(255,255,255,0.8); 
-    }
-    
-    /* สรุปยอดรวม Dashboard Cards */
-    .summary-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 7px;
-      margin-bottom: 12px;
-    }
-    .summary-card {
-      background: rgba(255, 255, 255, 0.8);
-      border-radius: 12px;
-      padding: 8px 4px;
-      text-align: center;
-      border: 1px solid rgba(255, 255, 255, 0.9);
-      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-    }
-    .summary-label {
-      font-size: 10.5px;
-      font-weight: 600;
-      color: #666;
-      margin-bottom: 2px;
-      white-space: nowrap;
-    }
-    .summary-value {
-      font-size: 13.5px;
-      font-weight: 700;
-      white-space: nowrap;
-    }
-    .val-income { color: #10ac84; }
-    .val-expense { color: #ee5253; }
-    .val-net { color: #5a2e5d; }
 
-    /* Form Fields & Label Styling */
-    .form-group { margin-bottom: 12px; }
+    /* Form Fields Styling */
+    .form-group { 
+      margin-bottom: 5px; 
+    }
     .field-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 5px;
+      margin-bottom: 3px;
     }
     label { 
       margin: 0;
-      font-size: 13.5px; 
+      font-size: 13px; 
       font-weight: 600; 
       color: #5a2e5d;
     }
     
-    /* ปุ่มไอคอนเล็กๆ สำหรับเพิ่มหมวด / เพิ่มคน */
     .btn-icon-mini {
       background: rgba(255, 255, 255, 0.85);
       border: 1px solid rgba(214, 51, 132, 0.3);
       color: #d63384;
-      border-radius: 20px;
-      padding: 2px 9px;
-      font-size: 11.5px;
+      border-radius: 16px;
+      padding: 1px 8px;
+      font-size: 11px;
       font-weight: 600;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 3px;
-      transition: all 0.2s;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+      gap: 2px;
     }
     .btn-icon-mini:active {
       transform: scale(0.94);
@@ -216,27 +160,32 @@
       color: white;
     }
 
-    /* Chips Container สำหรับกดเลือกหมวดหมู่ / ผู้ทำรายการ แทน Dropdown */
-    .chips-container {
+    /* แถบปุ่ม Chips เลื่อนแนวนอนบรรทัดเดียว ไม่กินพื้นที่ */
+    .chips-container-row {
       display: flex;
-      flex-wrap: wrap;
       gap: 6px;
-      max-height: 115px;
-      overflow-y: auto;
-      padding: 3px 1px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      white-space: nowrap;
+      padding: 2px 1px;
+      scrollbar-width: none; /* ซ่อน scrollbar */
+      -ms-overflow-style: none;
+    }
+    .chips-container-row::-webkit-scrollbar {
+      display: none;
     }
     .chip-btn {
-      padding: 7px 13px;
-      border-radius: 18px;
+      padding: 6px 13px;
+      border-radius: 16px;
       border: 1.5px solid rgba(255, 255, 255, 0.85);
       background: rgba(255, 255, 255, 0.75);
       color: #5a2e5d;
-      font-size: 13px;
+      font-size: 12.5px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.18s ease;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.04);
-      white-space: nowrap;
+      transition: all 0.15s ease;
+      flex-shrink: 0;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.03);
     }
     .chip-btn:active {
       transform: scale(0.95);
@@ -245,30 +194,28 @@
       background: #d63384;
       color: #ffffff;
       border-color: #d63384;
-      box-shadow: 0 4px 12px rgba(214, 51, 132, 0.35);
+      box-shadow: 0 3px 10px rgba(214, 51, 132, 0.35);
       transform: scale(1.02);
     }
 
     /* Inputs */
     input {
       width: 100%; 
-      padding: 11px 13px; 
-      border-radius: 12px; 
-      border: 2px solid rgba(255,255,255,0.7);
+      padding: 8px 11px; 
+      border-radius: 11px; 
+      border: 1.5px solid rgba(255,255,255,0.7);
       background: rgba(255,255,255,0.85); 
-      font-size: 15px; 
+      font-size: 14.5px; 
       outline: none; 
-      transition: 0.25s;
       color: #333; 
       font-weight: 500;
     }
     input:focus { 
       background: #fff; 
       border-color: #ff6b6b; 
-      box-shadow: 0 0 10px rgba(255,107,107,0.25);
     }
 
-    /* Date Picker Overlay (No Cluttered Icon, 100% Direct Tap) */
+    /* Date Picker Overlay */
     .date-picker-wrap {
       position: relative; 
       display: flex; 
@@ -285,109 +232,75 @@
     }
     #dateRaw::-webkit-calendar-picker-indicator {
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      opacity: 0;
-      cursor: pointer;
+      top: 0; left: 0; width: 100%; height: 100%;
+      opacity: 0; cursor: pointer;
     }
     
     .btn {
       width: 100%; 
-      padding: 13px; 
+      padding: 10px; 
       border-radius: 12px; 
       border: none;
-      font-size: 15px; 
+      font-size: 14.5px; 
       font-weight: 700; 
       cursor: pointer; 
-      transition: 0.2s;
       display: flex; 
       justify-content: center; 
       align-items: center; 
-      gap: 6px;
+      gap: 5px;
+      transition: transform 0.15s;
     }
     .btn:active { transform: scale(0.97); }
     .btn-deposit { 
       background: #1dd1a1; 
       color: white; 
-      box-shadow: 0 4px 15px rgba(29, 209, 161, 0.4); 
+      box-shadow: 0 3px 12px rgba(29, 209, 161, 0.35); 
     }
     .btn-withdraw { 
       background: #ff6b6b; 
       color: white; 
-      box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4); 
+      box-shadow: 0 3px 12px rgba(255, 107, 107, 0.35); 
     }
-    .btn-danger { 
-      background: #ff4d4f; 
-      color: white; 
-      padding: 5px 11px; 
-      font-size: 11.5px; 
-      width: auto; 
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-    }
-    .btn-small { 
-      padding: 4px 10px; 
-      font-size: 11.5px; 
-      background: #4facfe; 
-      color: white; 
-      border-radius: 8px; 
-      width: auto; 
-      font-weight: 500;
-      border: none;
-      cursor: pointer;
-    }
-    
-    .transaction-item {
-      background: rgba(255,255,255,0.8); 
-      border-radius: 12px; 
-      padding: 10px 12px; 
-      margin-bottom: 9px;
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center; 
-      border: 1px solid rgba(255,255,255,0.85);
-    }
-    .t-info { font-size: 12.5px; color: #444; }
-    .t-amount { font-weight: 700; font-size: 15px; }
-    .t-deposit { color: #10ac84; }
-    .t-withdraw { color: #ee5253; }
-    
-    /* กล่องแสดงยอดคงเหลือรายคน */
-    .balance-box {
-      display: flex; 
-      justify-content: space-between; 
+    .action-row { display: flex; gap: 8px; margin-top: 4px; }
+
+    /* แถบปุ่มด้านล่างสุด (Bottom Dock - ย้ายมาจากหัวเว็บ) */
+    .bottom-dock {
+      background: rgba(255, 255, 255, 0.65);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      padding: 6px 12px;
+      display: flex;
+      justify-content: space-around;
       align-items: center;
-      background: rgba(255,255,255,0.85); 
-      border-radius: 12px; 
-      padding: 10px 12px; 
-      margin-bottom: 8px;
-      border: 1px solid rgba(255,255,255,0.9);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+      flex-shrink: 0;
     }
-    .balance-name { 
-      font-weight: 600; 
-      color: #5a2e5d; 
-      white-space: nowrap; 
-      overflow: hidden; 
-      text-overflow: ellipsis; 
-      max-width: 140px; 
-      text-align: left;
+    .dock-btn {
+      background: transparent;
+      border: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      cursor: pointer;
+      padding: 4px 12px;
+      border-radius: 10px;
+      transition: background 0.15s;
     }
-    @media (min-width: 768px) {
-      .balance-name {
-        max-width: none;
-        overflow: visible;
-      }
+    .dock-btn:active {
+      background: rgba(255,255,255,0.8);
+      transform: scale(0.95);
     }
-    .balance-amount { 
-      font-size: 14.5px; 
-      font-weight: bold; 
-      color: #d63384; 
-      flex-grow: 1; 
-      text-align: right; 
-      margin: 0 10px;
+    .dock-icon {
+      font-size: 19px;
+      line-height: 1;
+    }
+    .dock-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #5a2e5d;
     }
 
     #loader { 
@@ -395,23 +308,20 @@
       text-align: center; 
       font-weight: bold; 
       color: white; 
-      margin-bottom: 12px; 
+      margin-bottom: 6px; 
       background: rgba(0,0,0,0.5); 
-      padding: 9px; 
-      border-radius: 12px;
-      font-size: 13px;
+      padding: 6px; 
+      border-radius: 10px;
+      font-size: 12px;
     }
-    .action-row { display: flex; gap: 8px; margin-top: 4px; }
 
     /* Modal Styling */
     .modal {
       display: none; 
       position: fixed; 
       z-index: 100; 
-      left: 0; 
-      top: 0;
-      width: 100%; 
-      height: 100%; 
+      left: 0; top: 0;
+      width: 100%; height: 100%; 
       background-color: rgba(0,0,0,0.45);
       backdrop-filter: blur(6px); 
       -webkit-backdrop-filter: blur(6px);
@@ -419,116 +329,111 @@
       padding: 20px 10px;
     }
     .modal-content {
-      background: rgba(255, 255, 255, 0.75); 
+      background: rgba(255, 255, 255, 0.85); 
       backdrop-filter: blur(20px); 
       -webkit-backdrop-filter: blur(20px);
       border-radius: 20px; 
-      border: 1px solid rgba(255,255,255,0.85);
+      border: 1px solid rgba(255,255,255,0.9);
       margin: 10px auto; 
       width: 100%; 
       max-width: 440px; 
-      padding: 18px;
+      padding: 16px;
       position: relative; 
       box-shadow: 0 10px 30px rgba(0,0,0,0.2);
     }
     .close-btn {
-      position: absolute; 
-      right: 14px; 
-      top: 14px; 
-      font-size: 26px; 
-      font-weight: bold;
-      color: #ff6b6b; 
-      cursor: pointer; 
-      line-height: 1;
+      position: absolute; right: 14px; top: 14px; 
+      font-size: 24px; font-weight: bold;
+      color: #ff6b6b; cursor: pointer; line-height: 1;
     }
+    .transaction-item {
+      background: rgba(255,255,255,0.85); 
+      border-radius: 11px; 
+      padding: 8px 10px; 
+      margin-bottom: 8px;
+      display: flex; justify-content: space-between; align-items: center; 
+      border: 1px solid rgba(255,255,255,0.9);
+    }
+    .t-info { font-size: 12px; color: #444; }
+    .t-amount { font-weight: 700; font-size: 14.5px; }
+    .t-deposit { color: #10ac84; }
+    .t-withdraw { color: #ee5253; }
+    .balance-box {
+      display: flex; justify-content: space-between; align-items: center;
+      background: rgba(255,255,255,0.85); border-radius: 11px; 
+      padding: 8px 10px; margin-bottom: 7px;
+      border: 1px solid rgba(255,255,255,0.9);
+    }
+    .balance-name { font-weight: 600; color: #5a2e5d; font-size: 13.5px; }
+    .balance-amount { font-size: 14px; font-weight: bold; color: #d63384; margin: 0 8px; }
 
     /* ================= PIN LOCK SCREEN ================= */
     #pinOverlay {
-      position: fixed;
-      inset: 0;
-      z-index: 9999;
-      background: linear-gradient(135deg, rgba(255,154,158,0.95), rgba(254,207,239,0.95));
-      backdrop-filter: blur(22px);
-      -webkit-backdrop-filter: blur(22px);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+      position: fixed; inset: 0; z-index: 9999;
+      background: linear-gradient(135deg, rgba(255,154,158,0.96), rgba(254,207,239,0.96));
+      backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
       padding: 20px;
     }
     .pin-card {
-      background: rgba(255,255,255,0.7);
-      border-radius: 24px;
-      padding: 26px 20px;
-      width: 100%;
-      max-width: 330px;
-      box-shadow: 0 12px 36px rgba(0,0,0,0.12);
-      text-align: center;
+      background: rgba(255,255,255,0.7); border-radius: 24px;
+      padding: 24px 18px; width: 100%; max-width: 320px;
+      box-shadow: 0 12px 36px rgba(0,0,0,0.12); text-align: center;
       border: 1px solid rgba(255,255,255,0.85);
     }
     .pin-dot {
-      width: 15px;
-      height: 15px;
-      border-radius: 50%;
-      border: 2px solid #d63384;
-      background: transparent;
+      width: 14px; height: 14px; border-radius: 50%;
+      border: 2px solid #d63384; background: transparent;
       transition: background 0.15s, transform 0.15s;
     }
-    .pin-dot.filled {
-      background: #d63384;
-      transform: scale(1.15);
-    }
+    .pin-dot.filled { background: #d63384; transform: scale(1.15); }
     .pin-keypad {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      max-width: 250px;
-      margin: 0 auto;
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 10px; max-width: 240px; margin: 0 auto;
     }
     .pin-key {
-      aspect-ratio: 1;
-      border-radius: 50%;
+      aspect-ratio: 1; border-radius: 50%;
       border: 1.5px solid rgba(255,255,255,0.85);
-      background: rgba(255,255,255,0.85);
-      color: #5a2e5d;
-      font-size: 21px;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-      transition: all 0.15s ease;
+      background: rgba(255,255,255,0.85); color: #5a2e5d;
+      font-size: 20px; font-weight: 700; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
     }
-    .pin-key:active {
-      transform: scale(0.9);
-      background: #d63384;
-      color: white;
-    }
-    .pin-key.pin-tool {
-      font-size: 16px;
-      background: rgba(255,255,255,0.5);
+    .pin-key:active { transform: scale(0.9); background: #d63384; color: white; }
+    .pin-key.pin-tool { font-size: 15px; background: rgba(255,255,255,0.5); }
+
+    /* Print Styles (Sarabun font for official statistics) */
+    @media print {
+      body * { visibility: hidden !important; }
+      #printReportArea, #printReportArea * { visibility: visible !important; }
+      #printReportArea {
+        position: fixed; left: 0; top: 0; width: 100%; height: 100%;
+        background: white !important; color: black !important;
+        font-family: 'Sarabun', sans-serif !important;
+        padding: 20px; z-index: 999999;
+      }
     }
   </style>
 </head>
 <body>
 
+<!-- พื้นที่สำหรับพิมพ์รายงานสถิติ (Sarabun) -->
+<div id="printReportArea" style="display:none;"></div>
+
 <!-- ================= PIN LOCK OVERLAY ================= -->
 <div id="pinOverlay">
   <div class="pin-card">
-    <img src="https://i.postimg.cc/T2Cngdnd/Financial.png" alt="logo" style="width:68px; height:68px; border-radius:18px; margin-bottom:10px; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
-    <h3 style="margin:0 0 5px 0; color:#d63384; font-size:19px;">ระบบบันทึกการใช้เงิน</h3>
-    <p id="pinMsg" style="margin:0 0 18px 0; color:#666; font-size:13.5px;">กรุณากรอกรหัส PIN 4 หลัก</p>
+    <img src="https://i.postimg.cc/T2Cngdnd/Financial.png" alt="logo" style="width:64px; height:64px; border-radius:16px; margin-bottom:8px; box-shadow:0 4px 10px rgba(0,0,0,0.1);">
+    <h3 style="margin:0 0 4px 0; color:#d63384; font-size:18px;">ระบบบันทึกการใช้เงิน</h3>
+    <p id="pinMsg" style="margin:0 0 16px 0; color:#666; font-size:13px;">กรุณากรอกรหัส PIN 4 หลัก</p>
     
-    <!-- Dots แสดงผล PIN -->
-    <div style="display:flex; justify-content:center; gap:16px; margin-bottom:22px;">
+    <div style="display:flex; justify-content:center; gap:14px; margin-bottom:18px;">
       <span class="pin-dot" id="dot-0"></span>
       <span class="pin-dot" id="dot-1"></span>
       <span class="pin-dot" id="dot-2"></span>
       <span class="pin-dot" id="dot-3"></span>
     </div>
     
-    <!-- Numeric Keypad -->
     <div class="pin-keypad">
       <button class="pin-key" onclick="pressPin('1')">1</button>
       <button class="pin-key" onclick="pressPin('2')">2</button>
@@ -548,64 +453,53 @@
 
 <div class="app-container">
   
-  <!-- Header Bar -->
+  <!-- Header Bar: หัวข้อแอป (ไม่มีไอคอน 4 ปุ่มแล้ว) -->
   <div class="header-bar">
     <div class="header-brand">
       <img src="https://i.postimg.cc/T2Cngdnd/Financial.png" alt="logo" class="header-logo">
       <h1 class="header-title">ระบบบันทึกการใช้เงิน</h1>
     </div>
-    <div class="header-actions">
-      <button class="header-icon-btn" onclick="openModal('balanceModal')" title="เช็คยอดคงเหลือ">📊</button>
-      <button class="header-icon-btn" onclick="openModal('recentModal')" title="10 รายการล่าสุด">🕒</button>
-      <button class="header-icon-btn" onclick="promptApiUrlSetting()" title="ตั้งค่า Web App API URL">⚙️</button>
-      <button class="header-icon-btn" onclick="lockScreen()" title="ล็อคหน้าจอ">🔒</button>
-    </div>
   </div>
 
   <div id="loader">✨ กำลังโหลดข้อมูล...</div>
 
-  <!-- ส่วนบันทึกรายการ (หน้าจอหลัก) -->
+  <!-- ส่วนบันทึกรายการ (หน้าจอหลัก - พอดีจอ ไม่ต้องเลื่อน) -->
   <div class="glass">
-    <h2>📝 บันทึกการเงิน</h2>
     
-    <!-- ช่องเลือกวันที่ พ.ศ. (แตะเลือกได้ทันที สะอาดตา) -->
+    <!-- ช่องเลือกวันที่ พ.ศ. -->
     <div class="form-group">
-      <label>📅 1. วันที่ทำรายการ (พ.ศ.)</label>
+      <label>📅 วันที่ทำรายการ (พ.ศ.)</label>
       <div class="date-picker-wrap">
         <input type="text" id="dateDisplay" readonly placeholder="วว/ดด/ปปปป" onclick="openDatePicker()" title="คลิกเพื่อเลือกวันที่" style="cursor:pointer; text-align:center; background:#ffffff; font-weight:600; color:#5a2e5d;">
         <input type="date" id="dateRaw" onchange="onDateChange(this.value)">
       </div>
     </div>
 
-    <!-- ปุ่มกดเลือกหมวดหมู่ (แทน Dropdown) -->
+    <!-- ปุ่มเลือกหมวดหมู่ (แนวนอนบรรทัดเดียว) -->
     <div class="form-group">
       <div class="field-header">
-        <label>📁 2. เลือกหมวดหมู่</label>
+        <label>📁 เลือกหมวดหมู่</label>
         <button type="button" class="btn-icon-mini" onclick="promptAddCategory()">➕ เพิ่มหมวด</button>
       </div>
-      <div id="categoryChips" class="chips-container">
-        <div style="font-size:12px; color:#777; padding:4px;">กำลังโหลดหมวดหมู่...</div>
-      </div>
+      <div id="categoryChips" class="chips-container-row"></div>
     </div>
     
-    <!-- ปุ่มกดเลือกผู้ทำรายการ (แทน Dropdown) -->
+    <!-- ปุ่มเลือกผู้ทำรายการ (แนวนอนบรรทัดเดียว) -->
     <div class="form-group">
       <div class="field-header">
-        <label>👤 3. ผู้ทำรายการ</label>
+        <label>👤 ผู้ทำรายการ</label>
         <button type="button" class="btn-icon-mini" onclick="promptAddStudent()">➕ เพิ่มคน</button>
       </div>
-      <div id="studentChips" class="chips-container">
-        <div style="font-size:12px; color:#777; padding:4px;">- กรุณาเลือกหมวดหมู่ก่อน -</div>
-      </div>
+      <div id="studentChips" class="chips-container-row"></div>
     </div>
     
     <div class="form-group">
-      <label>💵 4. จำนวนเงิน (บาท)</label>
+      <label>💵 จำนวนเงิน (บาท)</label>
       <input type="number" id="amountInput" inputmode="numeric" pattern="[0-9]*" placeholder="ระบุจำนวนเงิน" min="1">
     </div>
     
     <div class="form-group">
-      <label>💬 5. หมายเหตุ (ถ้ามี)</label>
+      <label>💬 หมายเหตุ (ถ้ามี)</label>
       <input type="text" id="remarkInput" placeholder="เช่น ค่าอาหาร, ฝากเงิน, ซื้อของ">
     </div>
     
@@ -615,24 +509,43 @@
     </div>
   </div>
 
+  <!-- แถบปุ่มด้านล่างสุด (ย้าย 3 ปุ่มลงมาที่นี่) -->
+  <div class="bottom-dock">
+    <button class="dock-btn" onclick="openModal('balanceModal')">
+      <span class="dock-icon">📊</span>
+      <span class="dock-label">เช็คยอด</span>
+    </button>
+    <button class="dock-btn" onclick="openModal('recentModal')">
+      <span class="dock-icon">🕒</span>
+      <span class="dock-label">ล่าสุด</span>
+    </button>
+    <button class="dock-btn" onclick="lockScreen()">
+      <span class="dock-icon">🔒</span>
+      <span class="dock-label">ล็อค PIN</span>
+    </button>
+  </div>
+
 </div>
 
 <!-- ================= MODALS ================= -->
 
-<!-- 1. Modal เช็คยอดคงเหลือ -->
+<!-- 1. Modal เช็คยอดคงเหลือ พร้อมปุ่มพิมพ์สถิติ -->
 <div id="balanceModal" class="modal">
   <div class="modal-content">
     <span class="close-btn" onclick="closeModal('balanceModal')">&times;</span>
-    <h3>📊 เช็คยอดคงเหลือผู้ทำรายการ</h3>
+    <h3 style="margin-bottom:8px;">📊 เช็คยอดคงเหลือ</h3>
     
     <div class="form-group">
       <label>เลือกหมวดหมู่:</label>
-      <div id="checkCategoryChips" class="chips-container" style="max-height:90px; margin-top:5px;"></div>
+      <div id="checkCategoryChips" class="chips-container-row" style="margin-top:4px;"></div>
     </div>
     
-    <div id="balanceListResult" style="margin-top:12px;">
-      <div style="text-align:center; color:#555; padding:10px;">กรุณาเลือกหมวดหมู่</div>
-    </div>
+    <div id="balanceListResult" style="margin-top:10px; max-height:220px; overflow-y:auto;"></div>
+
+    <!-- ปุ่มพิมพ์สถิติประจำหมวดหมู่ -->
+    <button class="btn" onclick="printCategoryStats()" style="margin-top:10px; background:#4facfe; color:white; font-size:13.5px; padding:9px;">
+      🖨️ พิมพ์รายงานสถิติหมวดหมู่นี้
+    </button>
   </div>
 </div>
 
@@ -641,7 +554,7 @@
   <div class="modal-content">
     <span class="close-btn" onclick="closeModal('recentModal')">&times;</span>
     <h3>🕒 10 รายการล่าสุด</h3>
-    <div id="recentTransactionsResult"></div>
+    <div id="recentTransactionsResult" style="max-height:320px; overflow-y:auto;"></div>
   </div>
 </div>
 
@@ -650,15 +563,49 @@
   <div class="modal-content">
     <span class="close-btn" onclick="closeModal('historyModal')">&times;</span>
     <h3 id="historyTitle" style="font-size:17px; margin-bottom:4px;">ประวัติ</h3>
-    <div style="text-align:center; color:#666; font-size:13px; margin-bottom:12px;" id="historySubtitle"></div>
-    <div id="historyListResult"></div>
+    <div style="text-align:center; color:#666; font-size:13px; margin-bottom:10px;" id="historySubtitle"></div>
+    <div id="historyListResult" style="max-height:300px; overflow-y:auto;"></div>
   </div>
 </div>
 
 <!-- ================= SCRIPTS ================= -->
 <script>
   // ==========================================
-  // 1. PIN LOCK SYSTEM (4 หลัก)
+  // ข้อมูลตั้งต้นจริงจาก Google Sheets (โหลดทันที 0ms ไม่มีค้าง)
+  // ==========================================
+  const INITIAL_REAL_DATA = {
+    students: [
+      {name:"มะนาว", category:"เงินทุน"},
+      {name:"โปเต้", category:"เงินทุน"},
+      {name:"อิคคิว", category:"เงินทุน"},
+      {name:"สตังค์", category:"เงินทุน"},
+      {name:"ใหม่", category:"เงินทุน"},
+      {name:"ออลนิว", category:"เงินทุน"},
+      {name:"ภูเขา", category:"เงินทุน"},
+      {name:"นิค", category:"เงินทุน"},
+      {name:"เนม", category:"เงินทุน"},
+      {name:"เกว", category:"เงินทุน"},
+      {name:"มินตรา", category:"เงินทุน"},
+      {name:"ตันหยง", category:"เงินทุน"},
+      {name:"ปาล์มมี่", category:"เงินทุน"},
+      {name:"นินจา", category:"เงินทุน"},
+      {name:"ปาล์ม", category:"เงินทุน"},
+      {name:"ห้องสมุด", category:"เงินโครงการ 70"}
+    ],
+    categories: ["เงินทุน", "เงินเลี้ยงไก่", "เงินโครงการ 70"],
+    balances: {"ห้องสมุด (เงินโครงการ 70)": 9440},
+    categoryBalances: {"เงินโครงการ 70": 9440},
+    totalIncome: 10000,
+    totalExpense: 560,
+    netBalance: 9440,
+    recent: [
+      {id:1795177731708, time:"20/11/2569 19:28", student:"ห้องสมุด", category:"เงินโครงการ 70", type:"ถอน", amount:560, remark:"ซื้อแผ่นเคลือบ"},
+      {id:1795177703682, time:"20/11/2569 19:28", student:"ห้องสมุด", category:"เงินโครงการ 70", type:"ฝาก", amount:10000, remark:"เงินโครงการ"}
+    ]
+  };
+
+  // ==========================================
+  // 1. PIN LOCK SYSTEM
   // ==========================================
   let currentEnteredPin = "";
   const PIN_STORAGE_KEY = 'financial_app_pin_v1';
@@ -714,7 +661,7 @@
       currentEnteredPin = "";
     } else {
       const msg = document.getElementById('pinMsg');
-      msg.innerText = "❌ รหัส PIN ไม่ถูกต้อง ลองใหม่อีกครั้ง";
+      msg.innerText = "❌ รหัส PIN ไม่ถูกต้อง";
       msg.style.color = "#ff4d4f";
       currentEnteredPin = "";
       updatePinDots();
@@ -746,37 +693,15 @@
   }
 
   // ==========================================
-  // 2. GAS API Bridge (สำหรับ GitHub Pages & Web App)
+  // 2. GAS API Bridge (URL ฝังถาวรในระบบ ไม่ต้องตั้งค่า)
   // ==========================================
-  const DEFAULT_GAS_URL = "https://script.google.com/macros/s/AKfycbyE1fW25SF41sBaOCilsKbBA67LPtE588IU768FYpsoZtU2CW9MFnTDb22bM-CysyM_/exec";
+  const GAS_URL = "https://script.google.com/macros/s/AKfycbyE1fW25SF41sBaOCilsKbBA67LPtE588IU768FYpsoZtU2CW9MFnTDb22bM-CysyM_/exec";
 
-  function getGasApiUrl() {
-    return localStorage.getItem('financial_gas_api_url') || DEFAULT_GAS_URL;
-  }
-
-  function promptApiUrlSetting() {
-    let current = getGasApiUrl();
-    let input = prompt("⚙️ ตั้งค่า Google Apps Script Web App URL:\n(ต้องลงท้ายด้วย /exec และตั้งสิทธิ์ Anyone ใน Google Sheet)", current);
-    if (input !== null) {
-      input = input.trim();
-      if (input) {
-        localStorage.setItem('financial_gas_api_url', input);
-        alert("✅ บันทึก Web App URL เรียบร้อยแล้ว ระบบกำลังโหลดข้อมูลใหม่!");
-        location.reload();
-      } else {
-        localStorage.removeItem('financial_gas_api_url');
-        alert("รีเซ็ตเป็น URL เริ่มต้นแล้ว");
-        location.reload();
-      }
-    }
-  }
-
-  // สร้าง Proxy สำหรับ google.script.run ที่รองรับการ Chaining แบบสมบูรณ์ 100%
   function createGasProxy(successFn, failureFn) {
     const runner = {
       successFn: successFn || function() {},
       failureFn: failureFn || function(err) {
-        console.error("GAS Request Error:", err);
+        console.warn("GAS Sync Warning:", err);
         showLoader(false);
       },
       withSuccessHandler: function(fn) {
@@ -793,20 +718,8 @@
           return target[prop];
         }
         return function(...args) {
-          let apiUrl = getGasApiUrl();
-          if (!apiUrl) {
-            promptApiUrlSetting();
-            apiUrl = getGasApiUrl();
-            if (!apiUrl) {
-              showLoader(false);
-              target.failureFn(new Error("Missing GAS API URL"));
-              return;
-            }
-          }
-
-          // พยายามยิงผ่าน GET ก่อนเพื่อความเร็วสูงสุด และหลีกเลี่ยง CORS / 302 Redirect issues บน GitHub Pages
           const encodedArgs = encodeURIComponent(JSON.stringify(args));
-          const getUrl = `${apiUrl}?action=${encodeURIComponent(prop)}&args=${encodedArgs}`;
+          const getUrl = `${GAS_URL}?action=${encodeURIComponent(prop)}&args=${encodedArgs}`;
 
           fetch(getUrl)
             .then(res => {
@@ -822,8 +735,7 @@
               }
             })
             .catch(err => {
-              // หาก GET มีปัญหา ให้ fallback ไป POST
-              fetch(apiUrl, {
+              fetch(GAS_URL, {
                 method: "POST",
                 headers: { "Content-Type": "text/plain;charset=utf-8" },
                 body: JSON.stringify({ action: prop, args: args })
@@ -854,7 +766,7 @@
   }
 
   // ==========================================
-  // 3. CACHE & UI RENDERING
+  // 3. UI STATE & RENDERING
   // ==========================================
   let globalStudents = [];
   let globalBalances = {};
@@ -864,48 +776,32 @@
   let selectedStudent = "";
   let checkSelectedCat = "";
 
-  const CACHE_KEY = "financial_dashboard_cache_v2";
+  const CACHE_KEY = "financial_dashboard_cache_v3";
 
   window.onload = function() {
     checkLockState();
     initDefaultDate();
     
-    // โหลดข้อมูลจากแคชในเครื่องทันที 0ms เพื่อให้แอปเปิดเร็วที่สุด
-    loadCachedData();
+    // 1. โหลดข้อมูลแคชหรือข้อมูลเริ่มต้นทันที 0ms เพื่อให้กดเลือกหมวดหมู่ได้ทันที
+    const cached = localStorage.getItem(CACHE_KEY);
+    const initialData = cached ? JSON.parse(cached) : INITIAL_REAL_DATA;
+    updateUI(initialData);
 
-    // ดึงข้อมูลสดจาก Google Sheets ในเบื้องหลัง
-    showLoader(true);
+    // 2. ดึงข้อมูลสดจาก Google Sheets ในเบื้องหลัง
     google.script.run
       .withSuccessHandler(data => {
         showLoader(false);
-        if (data && data.categories) {
+        if (data && data.categories && data.categories.length > 0) {
           localStorage.setItem(CACHE_KEY, JSON.stringify(data));
           updateUI(data);
         }
       })
       .withFailureHandler(err => {
         showLoader(false);
-        console.error("Dashboard load failed:", err);
       })
       .getDashboardData();
-
-    // ตัวป้องกัน Loader ค้าง: บังคับปิด Loader หลังจาก 5 วินาทีเสมอ
-    setTimeout(() => {
-      showLoader(false);
-    }, 5000);
   };
 
-  function loadCachedData() {
-    try {
-      const cached = localStorage.getItem(CACHE_KEY);
-      if (cached) {
-        const parsed = JSON.parse(cached);
-        updateUI(parsed);
-      }
-    } catch(e) {}
-  }
-
-  // ระบบจัดการวันที่ พ.ศ. (dd/mm/yyyy)
   function initDefaultDate() {
     const today = new Date();
     const yyyy = today.getFullYear();
@@ -946,11 +842,7 @@
   function openModal(id) { document.getElementById(id).style.display = 'block'; }
   function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-  // -------------------------------------------------------------
-  // อัปเดต UI จากข้อมูล Backend
-  // -------------------------------------------------------------
   function updateUI(data) {
-    showLoader(false);
     if (!data) return;
     
     globalStudents = data.students || [];
@@ -958,37 +850,20 @@
     globalCategories = data.categories || [];
     globalRecent = data.recent || [];
 
-    // อัปเดตการ์ดยอดรวมภาพรวม (หากมี)
-    const totalIncome = Number(data.totalIncome) || 0;
-    const totalExpense = Number(data.totalExpense) || 0;
-    const netBalance = Number(data.netBalance) || (totalIncome - totalExpense);
-    
-    const elIncome = document.getElementById('dashTotalIncome');
-    if (elIncome) elIncome.innerText = totalIncome.toLocaleString() + ' ฿';
-    const elExpense = document.getElementById('dashTotalExpense');
-    if (elExpense) elExpense.innerText = totalExpense.toLocaleString() + ' ฿';
-    const elNet = document.getElementById('dashNetBalance');
-    if (elNet) elNet.innerText = netBalance.toLocaleString() + ' ฿';
-
-    // เรนเดอร์ปุ่มหมวดหมู่ (Chips)
     renderCategoryChips();
-
-    // เรนเดอร์ปุ่มหมวดหมู่ใน Modal เช็คยอด
     renderCheckCategoryChips();
-
-    // เรนเดอร์ 10 รายการล่าสุด
     renderRecentTransactions(globalRecent);
   }
 
-  // เรนเดอร์ Category Chips
+  // เรนเดอร์ปุ่มหมวดหมู่ (Chips แนวนอน)
   function renderCategoryChips() {
     const container = document.getElementById('categoryChips');
-    if (globalCategories.length === 0) {
-      container.innerHTML = '<div style="font-size:12px; color:#666; padding:4px;">ยังไม่มีหมวดหมู่ (กดปุ่ม ➕ เพิ่มหมวด)</div>';
+    if (!globalCategories || globalCategories.length === 0) {
+      container.innerHTML = '<div style="font-size:12px; color:#666;">ยังไม่มีหมวดหมู่</div>';
       return;
     }
 
-    if (!selectedCategory && globalCategories.length > 0) {
+    if (!selectedCategory || !globalCategories.includes(selectedCategory)) {
       selectedCategory = globalCategories[0];
     }
 
@@ -1007,22 +882,21 @@
     renderCategoryChips();
   }
 
-  // เรนเดอร์ Student / ผู้ทำรายการ Chips
+  // เรนเดอร์ปุ่มผู้ทำรายการ (Chips แนวนอน)
   function renderStudentChips() {
     const container = document.getElementById('studentChips');
     if (!selectedCategory) {
-      container.innerHTML = '<div style="font-size:12px; color:#777; padding:4px;">- กรุณาเลือกหมวดหมู่ก่อน -</div>';
+      container.innerHTML = '<div style="font-size:12px; color:#777;">- กรุณาเลือกหมวดหมู่ก่อน -</div>';
       return;
     }
 
     const filtered = globalStudents.filter(s => s.category === selectedCategory);
     if (filtered.length === 0) {
-      container.innerHTML = '<div style="font-size:12px; color:#777; padding:4px;">ยังไม่มีผู้ทำรายการในหมวดนี้ (กดปุ่ม ➕ เพิ่มคน)</div>';
+      container.innerHTML = '<div style="font-size:12px; color:#777;">ยังไม่มีผู้ทำรายการในหมวดนี้</div>';
       selectedStudent = "";
       return;
     }
 
-    // หากยังไม่ได้เลือก หรือคนที่เลือกไม่อยู่ในหมวดนี้ ให้เลือกคนแรกเป็นค่าเริ่มต้น
     const exists = filtered.some(s => s.name === selectedStudent);
     if (!exists) {
       selectedStudent = filtered[0].name;
@@ -1044,12 +918,12 @@
   // เรนเดอร์ Chips ใน Modal เช็คยอด
   function renderCheckCategoryChips() {
     const container = document.getElementById('checkCategoryChips');
-    if (globalCategories.length === 0) {
+    if (!globalCategories || globalCategories.length === 0) {
       container.innerHTML = '<div style="font-size:12px; color:#777;">ไม่มีหมวดหมู่</div>';
       return;
     }
 
-    if (!checkSelectedCat && globalCategories.length > 0) {
+    if (!checkSelectedCat || !globalCategories.includes(checkSelectedCat)) {
       checkSelectedCat = globalCategories[0];
     }
 
@@ -1070,13 +944,13 @@
   function renderBalanceList() {
     const resultDiv = document.getElementById('balanceListResult');
     if (!checkSelectedCat) {
-      resultDiv.innerHTML = '<div style="text-align:center; color:#555; padding:10px;">กรุณาเลือกหมวดหมู่</div>';
+      resultDiv.innerHTML = '<div style="text-align:center; color:#555; padding:8px;">กรุณาเลือกหมวดหมู่</div>';
       return;
     }
 
     const studentsInCat = globalStudents.filter(s => s.category === checkSelectedCat);
     if (studentsInCat.length === 0) {
-      resultDiv.innerHTML = '<div style="text-align:center; color:#555; padding:10px;">ไม่มีผู้ทำรายการในหมวดหมู่นี้</div>';
+      resultDiv.innerHTML = '<div style="text-align:center; color:#555; padding:8px;">ไม่มีผู้ทำรายการในหมวดนี้</div>';
       return;
     }
 
@@ -1086,9 +960,9 @@
       const bal = globalBalances[balKey] || 0;
       html += `
         <div class="balance-box">
-          <div class="balance-name" title="${s.name}">${s.name}</div>
+          <div class="balance-name">${s.name}</div>
           <div class="balance-amount">${bal.toLocaleString()} ฿</div>
-          <button class="btn btn-small" onclick="viewHistory('${s.name}', '${checkSelectedCat}')">📄 ประวัติ</button>
+          <button class="btn-icon-mini" onclick="viewHistory('${s.name}', '${checkSelectedCat}')" style="background:#e0f2fe; color:#0369a1; border:none; padding:3px 9px;">ประวัติ</button>
         </div>`;
     });
     resultDiv.innerHTML = html;
@@ -1107,11 +981,11 @@
           <div class="transaction-item">
             <div class="t-info">
               <strong>${r.student}</strong> (${r.category})<br>
-              <span style="color:#666; font-size:11.5px;">${r.time} | ${r.remark || '-'}</span>
+              <span style="color:#666; font-size:11px;">${r.time} | ${r.remark || '-'}</span>
             </div>
             <div style="text-align:right;">
               <div class="t-amount ${colorClass}">${sign}${Number(r.amount).toLocaleString()} ฿</div>
-              <button class="btn btn-danger" onclick="deleteItem('${r.id}')">ลบ</button>
+              <button class="btn-icon-mini" onclick="deleteItem('${r.id}')" style="background:#fee2e2; color:#ef4444; border:none; margin-top:2px;">ลบ</button>
             </div>
           </div>`;
       });
@@ -1122,14 +996,14 @@
   function viewHistory(studentName, category) {
     document.getElementById('historyTitle').innerText = studentName;
     document.getElementById('historySubtitle').innerText = `หมวดหมู่: ${category}`;
-    document.getElementById('historyListResult').innerHTML = '<div style="text-align:center; padding:15px;">กำลังโหลด...</div>';
+    document.getElementById('historyListResult').innerHTML = '<div style="text-align:center; padding:10px;">กำลังโหลด...</div>';
     
     openModal('historyModal');
 
     google.script.run.withSuccessHandler(history => {
       let html = '';
       if (!history || history.length === 0) {
-        html = '<div style="text-align:center; color:#666; padding:15px;">ไม่พบประวัติการทำรายการ</div>';
+        html = '<div style="text-align:center; color:#666; padding:12px;">ไม่พบประวัติการทำรายการ</div>';
       } else {
         history.forEach(r => {
           const isDeposit = (r.type === 'ฝาก' || r.type === 'รายรับ');
@@ -1139,11 +1013,11 @@
             <div class="transaction-item">
               <div class="t-info">
                 <strong>${r.type}</strong> (${Number(r.amount).toLocaleString()} ฿)<br>
-                <span style="color:#666; font-size:11.5px;">${r.time} | ${r.remark || '-'}</span>
+                <span style="color:#666; font-size:11px;">${r.time} | ${r.remark || '-'}</span>
               </div>
               <div style="text-align:right;">
                 <div class="t-amount ${colorClass}">${sign}${Number(r.amount).toLocaleString()} ฿</div>
-                <button class="btn btn-danger" onclick="deleteItem('${r.id}', true)">ลบ</button>
+                <button class="btn-icon-mini" onclick="deleteItem('${r.id}', true)" style="background:#fee2e2; color:#ef4444; border:none;">ลบ</button>
               </div>
             </div>`;
         });
@@ -1164,16 +1038,17 @@
       return;
     }
     if (!student) {
-      alert('⚠️ กรุณาเลือกผู้ทำรายการ (หรือกดปุ่ม ➕ เพิ่มคน)');
+      alert('⚠️ กรุณาเลือกผู้ทำรายการ (หรือกด ➕ เพิ่มคน)');
       return;
     }
     if (!amount || Number(amount) <= 0) {
-      alert('⚠️ กรุณาระบุจำนวนเงินให้ถูกต้อง (มากกว่า 0)');
+      alert('⚠️ กรุณาระบุจำนวนเงิน');
       return;
     }
 
     showLoader(true);
     google.script.run.withSuccessHandler(res => {
+      showLoader(false);
       localStorage.setItem(CACHE_KEY, JSON.stringify(res));
       updateUI(res);
       document.getElementById('amountInput').value = '';
@@ -1183,9 +1058,10 @@
   }
 
   function deleteItem(id, fromHistoryModal = false) {
-    if (confirm('❓ แน่ใจหรือไม่ว่าต้องการลบรายการนี้? (ระบบจะคำนวณยอดเงินใหม่ให้อัตโนมัติ)')) {
+    if (confirm('❓ แน่ใจหรือไม่ว่าต้องการลบรายการนี้?')) {
       showLoader(true);
       google.script.run.withSuccessHandler(res => {
+        showLoader(false);
         localStorage.setItem(CACHE_KEY, JSON.stringify(res));
         updateUI(res);
         if (fromHistoryModal) closeModal('historyModal'); 
@@ -1195,13 +1071,14 @@
 
   function promptAddStudent() {
     if (!selectedCategory) {
-      alert('⚠️ กรุณาเลือก "หมวดหมู่" ก่อนทำการเพิ่มผู้ทำรายการ!');
+      alert('⚠️ กรุณาเลือกหมวดหมู่ก่อน');
       return;
     }
     const name = prompt(`กรอกชื่อผู้ทำรายการใหม่ ในหมวดหมู่ "${selectedCategory}":`);
     if (name && name.trim()) { 
       showLoader(true); 
       google.script.run.withSuccessHandler(res => {
+        showLoader(false);
         selectedStudent = name.trim();
         localStorage.setItem(CACHE_KEY, JSON.stringify(res));
         updateUI(res);
@@ -1214,6 +1091,7 @@
     if (cat && cat.trim()) { 
       showLoader(true); 
       google.script.run.withSuccessHandler(res => {
+        showLoader(false);
         selectedCategory = cat.trim();
         localStorage.setItem(CACHE_KEY, JSON.stringify(res));
         updateUI(res);
@@ -1221,10 +1099,72 @@
     }
   }
 
-  // PWA Service Worker Registration & Auto-Update
+  // ==========================================
+  // 4. พิมพ์รายงานสถิติ (Sarabun Font)
+  // ==========================================
+  function printCategoryStats() {
+    if (!checkSelectedCat) {
+      alert("กรุณาเลือกหมวดหมู่ก่อนพิมพ์");
+      return;
+    }
+
+    const studentsInCat = globalStudents.filter(s => s.category === checkSelectedCat);
+    const dateText = document.getElementById('dateDisplay').value;
+    let totalCatBalance = 0;
+
+    let rowsHtml = '';
+    studentsInCat.forEach((s, idx) => {
+      const balKey = `${s.name} (${checkSelectedCat})`;
+      const bal = globalBalances[balKey] || 0;
+      totalCatBalance += bal;
+      rowsHtml += `
+        <tr>
+          <td style="border:1px solid #333; padding:8px; text-align:center;">${idx + 1}</td>
+          <td style="border:1px solid #333; padding:8px;">${s.name}</td>
+          <td style="border:1px solid #333; padding:8px; text-align:right;">${bal.toLocaleString()} บาท</td>
+        </tr>`;
+    });
+
+    const reportHtml = `
+      <div style="font-family:'Sarabun', sans-serif; padding:10px; color:#000;">
+        <h2 style="text-align:center; margin:0 0 5px 0;">รายงานสถิติยอดเงินคงเหลือ</h2>
+        <h3 style="text-align:center; margin:0 0 15px 0; font-weight:normal;">หมวดหมู่: <strong>${checkSelectedCat}</strong> | ข้อมูล ณ วันที่: ${dateText}</h3>
+        <table style="width:100%; border-collapse:collapse; margin-bottom:15px; font-size:14px;">
+          <thead>
+            <tr style="background:#f2f2f2;">
+              <th style="border:1px solid #333; padding:8px; width:60px;">ลำดับ</th>
+              <th style="border:1px solid #333; padding:8px; text-align:left;">ชื่อผู้ทำรายการ</th>
+              <th style="border:1px solid #333; padding:8px; text-align:right; width:150px;">ยอดเงินคงเหลือ</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rowsHtml || '<tr><td colspan="3" style="text-align:center; padding:10px;">ไม่มีข้อมูล</td></tr>'}
+          </tbody>
+          <tfoot>
+            <tr style="font-weight:bold; background:#fafafa;">
+              <td colspan="2" style="border:1px solid #333; padding:8px; text-align:right;">ยอดเงินรวมทั้งสิ้น:</td>
+              <td style="border:1px solid #333; padding:8px; text-align:right;">${totalCatBalance.toLocaleString()} บาท</td>
+            </tr>
+          </tfoot>
+        </table>
+        <div style="text-align:right; font-size:12px; margin-top:30px;">
+          <p>ลงชื่อ .............................................................. ผู้จัดทำรายงาน</p>
+          <p>วันที่พิมพ์: ${dateText}</p>
+        </div>
+      </div>
+    `;
+
+    const printArea = document.getElementById('printReportArea');
+    printArea.innerHTML = reportHtml;
+    printArea.style.display = 'block';
+    window.print();
+    printArea.style.display = 'none';
+  }
+
+  // PWA Service Worker
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js?v=3').then(reg => {
+      navigator.serviceWorker.register('./sw.js?v=4').then(reg => {
         reg.update();
       }).catch(() => {});
     });
