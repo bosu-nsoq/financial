@@ -5,10 +5,72 @@
  */
 
 function doGet(e) {
-  return HtmlService.createHtmlOutputFromFile('Index')
+  // หากมีการเรียกผ่าน GET พารามิเตอร์ action (API Mode สำหรับดึงข้อมูล)
+  if (e && e.parameter && e.parameter.action) {
+    try {
+      var action = e.parameter.action;
+      var args = e.parameter.args ? JSON.parse(e.parameter.args) : [];
+      var fn = (typeof globalThis !== 'undefined' && typeof globalThis[action] === 'function') 
+               ? globalThis[action] 
+               : (typeof this[action] === 'function' ? this[action] : null);
+
+      if (!fn) {
+        return ContentService.createTextOutput(JSON.stringify({ error: "ไม่พบฟังก์ชัน: " + action }))
+          .setMimeType(ContentService.MimeType.JSON);
+      }
+
+      var result = fn.apply(null, args);
+      return ContentService.createTextOutput(JSON.stringify(result !== undefined ? result : { status: "success" }))
+        .setMimeType(ContentService.MimeType.JSON);
+    } catch (err) {
+      return ContentService.createTextOutput(JSON.stringify({ error: err.toString() }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+  }
+
+  var html;
+  try {
+    html = HtmlService.createHtmlOutputFromFile('index');
+  } catch(err) {
+    html = HtmlService.createHtmlOutputFromFile('Index');
+  }
+  return html
     .setTitle('Financial & Expense Tracker')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+
+// -----------------------------------------------------------------------------
+// API Bridge: รองรับการเรียกใช้งานข้ามโดเมนจาก GitHub Pages ผ่าน POST
+// -----------------------------------------------------------------------------
+function doPost(e) {
+  try {
+    var contents = (e && e.postData && e.postData.contents) ? e.postData.contents : "{}";
+    var data = JSON.parse(contents);
+    var action = data.action;
+    var args = data.args || [];
+    
+    // เรียกฟังก์ชันตามชื่อ action ที่หน้าเว็บส่งมา
+    var fn = (typeof globalThis !== 'undefined' && typeof globalThis[action] === 'function') 
+             ? globalThis[action] 
+             : (typeof this[action] === 'function' ? this[action] : null);
+
+    if (!fn) {
+      return ContentService.createTextOutput(JSON.stringify({ 
+        error: "ไม่พบฟังก์ชัน: " + action 
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // ประมวลผลและส่งผลลัพธ์กลับในรูปแบบ JSON
+    var result = fn.apply(null, args);
+    return ContentService.createTextOutput(JSON.stringify(result !== undefined ? result : { status: "success" }))
+      .setMimeType(ContentService.MimeType.JSON);
+
+  } catch (err) {
+    return ContentService.createTextOutput(JSON.stringify({ 
+      error: "Error: " + err.toString() 
+    })).setMimeType(ContentService.MimeType.JSON);
+  }
 }
 
 // -----------------------------------------------------------------------------

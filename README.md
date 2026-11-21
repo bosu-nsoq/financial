@@ -4,6 +4,13 @@
 
 ---
 
+## 🌐 ลิงก์เข้าใช้งาน Web App
+
+- **ใช้งานผ่าน GitHub Pages (แนะนำ):** [https://bosu-nsoq.github.io/financial/](https://bosu-nsoq.github.io/financial/)
+- **ใช้งานผ่าน Google Apps Script โดยตรง:** `https://script.google.com/macros/s/AKfycbyE1fW25SF41sBaOCilsKbBA67LPtE588IU768FYpsoZtU2CW9MFnTDb22bM-CysyM_/exec`
+
+---
+
 ## ✨ ฟีเจอร์เด่นของระบบ
 
 1. **บันทึกรายรับและรายจ่าย (ฝาก/ถอน):**

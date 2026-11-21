@@ -324,6 +324,7 @@
   
   <div class="header-bar">
     <h1 class="header-title">💰 บันทึกรายรับ-รายจ่าย</h1>
+    <button onclick="promptApiUrlSetting()" title="ตั้งค่า Web App API URL" style="background:rgba(255,255,255,0.7); border:1px solid rgba(255,255,255,0.8); border-radius:50%; width:32px; height:32px; cursor:pointer; font-size:15px; margin-left:10px; display:inline-flex; align-items:center; justify-content:center; box-shadow:0 2px 5px rgba(0,0,0,0.05);">⚙️</button>
   </div>
 
   <div id="loader">✨ กำลังโหลดข้อมูล...</div>
@@ -443,6 +444,87 @@
 
 <!-- ================= SCRIPTS ================= -->
 <script>
+  // ==========================================
+  // GAS API Bridge (รองรับทั้ง Google Apps Script และ GitHub Pages)
+  // ==========================================
+  const DEFAULT_GAS_URL = "https://script.google.com/macros/s/AKfycbyE1fW25SF41sBaOCilsKbBA67LPtE588IU768FYpsoZtU2CW9MFnTDb22bM-CysyM_/exec";
+
+  function getGasApiUrl() {
+    return localStorage.getItem('financial_gas_api_url') || DEFAULT_GAS_URL;
+  }
+
+  function promptApiUrlSetting() {
+    let current = getGasApiUrl();
+    let input = prompt("กรุณาระบุ Google Apps Script Web App URL (ที่ลงท้ายด้วย /exec):", current);
+    if (input !== null) {
+      input = input.trim();
+      if (input) {
+        localStorage.setItem('financial_gas_api_url', input);
+        alert("✅ บันทึก Web App URL เรียบร้อยแล้ว ระบบพร้อมทำงาน!");
+        location.reload();
+      } else {
+        localStorage.removeItem('financial_gas_api_url');
+        alert("รีเซ็ตเป็น URL เริ่มต้นแล้ว");
+        location.reload();
+      }
+    }
+  }
+
+  // หากรันบน GitHub Pages (ไม่มี google.script.run natively) ให้จำลองด้วย Proxy Bridge
+  if (!window.google || !window.google.script || !window.google.script.run) {
+    window.google = window.google || {};
+    window.google.script = window.google.script || {};
+
+    function GasRunner(successFn, failureFn) {
+      this.successFn = successFn || function() {};
+      this.failureFn = failureFn || function(err) {
+        console.error("GAS Request Error:", err);
+        showLoader(false);
+        alert("❌ ไม่สามารถติดต่อเซิร์ฟเวอร์ Google Apps Script ได้\nกรุณาตรวจสอบการตั้งค่า Web App URL (⚙️) หรือการอนุญาตสิทธิ์");
+      };
+    }
+
+    GasRunner.prototype.withSuccessHandler = function(fn) {
+      return new GasRunner(fn, this.failureFn);
+    };
+
+    GasRunner.prototype.withFailureHandler = function(fn) {
+      return new GasRunner(this.successFn, fn);
+    };
+
+    window.google.script.run = new Proxy(new GasRunner(), {
+      get: function(target, prop) {
+        if (prop === 'withSuccessHandler' || prop === 'withFailureHandler') {
+          return target[prop].bind(target);
+        }
+        return function(...args) {
+          let apiUrl = getGasApiUrl();
+          if (!apiUrl) {
+            promptApiUrlSetting();
+            apiUrl = getGasApiUrl();
+            if (!apiUrl) {
+              target.failureFn(new Error("Missing GAS API URL"));
+              return;
+            }
+          }
+
+          fetch(apiUrl, {
+            method: "POST",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({ action: prop, args: args })
+          })
+          .then(res => res.json())
+          .then(data => {
+            target.successFn(data);
+          })
+          .catch(err => {
+            target.failureFn(err);
+          });
+        };
+      }
+    });
+  }
+
   let globalStudents = [];
   let globalBalances = {};
   let globalCategories = [];
