@@ -35,7 +35,7 @@ function doGet(e) {
     html = HtmlService.createHtmlOutputFromFile('Index');
   }
   return html
-    .setTitle('Financial & Expense Tracker')
+    .setTitle('Financial')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }

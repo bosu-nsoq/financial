@@ -1,7 +1,7 @@
 {
-  "name": "ระบบบันทึกรายรับ-รายจ่าย (Financial & Expense Tracker)",
-  "short_name": "บันทึกการเงิน",
-  "description": "เว็บแอปพลิเคชันบันทึกรายรับ-รายจ่ายและเงินออมผ่าน Google Apps Script และ Google Sheets",
+  "name": "Financial - ระบบบันทึกการใช้งาน",
+  "short_name": "Financial",
+  "description": "ระบบบันทึกการใช้งาน",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
@@ -10,13 +10,13 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/2936/2936758.png",
+      "src": "https://i.postimg.cc/T2Cngdnd/Financial.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/2936/2936758.png",
+      "src": "https://i.postimg.cc/T2Cngdnd/Financial.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
