@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  
+  <!-- PWA & iOS Web App Meta Tags -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#FF9A9E">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="บันทึกการเงิน">
+  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2936/2936758.png">
+
+  <!-- โหลดฟอนต์ Mali จาก Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Mali:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    * { 
+      box-sizing: border-box; 
+      font-family: 'Mali', cursive, sans-serif; 
+    }
+    
+    body {
+      margin: 0; 
+      padding: 16px 10px;
+      background: linear-gradient(45deg, #FF9A9E, #FECFEF, #F6D365, #FDA085);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+      min-height: 100vh; 
+      display: flex; 
+      justify-content: center; 
+      color: #333;
+    }
+    
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    .app-container { 
+      width: 100%; 
+      max-width: 450px; 
+    }
+
+    /* Single-line Responsive Header */
+    .header-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+    .header-title {
+      margin: 0;
+      color: #d63384;
+      font-size: 22px;
+      font-weight: 700;
+      text-shadow: 1px 1px 3px rgba(255,255,255,0.9);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    /* ดีไซน์กระจกฝ้า Glassmorphism */
+    .glass {
+      background: rgba(255, 255, 255, 0.45); 
+      backdrop-filter: blur(16px); 
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 20px; 
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+      padding: 18px; 
+      margin-bottom: 16px;
+    }
+    
+    h2, h3 { 
+      margin-top: 0; 
+      color: #d63384; 
+      text-align: center; 
+      text-shadow: 1px 1px 2px rgba(255,255,255,0.8); 
+    }
+    
+    /* สรุปยอดรวม Dashboard Cards */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .summary-card {
+      background: rgba(255, 255, 255, 0.75);
+      border-radius: 12px;
+      padding: 10px 4px;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    }
+    .summary-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #666;
+      margin-bottom: 2px;
+      white-space: nowrap;
+    }
+    .summary-value {
+      font-size: 14.5px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .val-income { color: #10ac84; }
+    .val-expense { color: #ee5253; }
+    .val-net { color: #5a2e5d; }
+
+    .form-group { margin-bottom: 13px; }
+    label { 
+      display: block; 
+      margin-bottom: 5px; 
+      font-size: 14px; 
+      font-weight: 600; 
+      color: #5a2e5d;
+    }
+    
+    select, input {
+      width: 100%; 
+      padding: 12px; 
+      border-radius: 12px; 
+      border: 2px solid rgba(255,255,255,0.7);
+      background: rgba(255,255,255,0.85); 
+      font-size: 15px; 
+      outline: none; 
+      transition: 0.3s;
+      color: #333; 
+      font-weight: 500;
+    }
+    select:focus, input:focus { 
+      background: #fff; 
+      border-color: #ff6b6b; 
+      box-shadow: 0 0 10px rgba(255,107,107,0.3);
+    }
+
+    /* Date Picker Overlay (No Cluttered Icon, 100% Direct Tap) */
+    .date-picker-wrap {
+      position: relative; 
+      display: flex; 
+      align-items: center;
+      width: 100%;
+    }
+    #dateRaw {
+      position: absolute; 
+      inset: 0; 
+      width: 100%; 
+      height: 100%; 
+      opacity: 0; 
+      cursor: pointer;
+    }
+    #dateRaw::-webkit-calendar-picker-indicator {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+    
+    .btn {
+      width: 100%; 
+      padding: 13px; 
+      border-radius: 12px; 
+      border: none;
+      font-size: 15px; 
+      font-weight: 700; 
+      cursor: pointer; 
+      transition: 0.25s;
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      gap: 6px;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn-deposit { 
+      background: #1dd1a1; 
+      color: white; 
+      box-shadow: 0 4px 15px rgba(29, 209, 161, 0.4); 
+    }
+    .btn-withdraw { 
+      background: #ff6b6b; 
+      color: white; 
+      box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4); 
+    }
+    .btn-secondary { 
+      background: rgba(255,255,255,0.85); 
+      color: #5a2e5d; 
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06); 
+    }
+    .btn-danger { 
+      background: #ff4d4f; 
+      color: white; 
+      padding: 6px 12px; 
+      font-size: 12px; 
+      width: auto; 
+      border-radius: 8px;
+    }
+    .btn-small { 
+      padding: 5px 10px; 
+      font-size: 12px; 
+      background: #4facfe; 
+      color: white; 
+      border-radius: 8px; 
+      width: auto; 
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+    }
+    
+    .transaction-item {
+      background: rgba(255,255,255,0.75); 
+      border-radius: 12px; 
+      padding: 12px; 
+      margin-bottom: 10px;
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      border: 1px solid rgba(255,255,255,0.85);
+    }
+    .t-info { font-size: 13px; color: #444; }
+    .t-amount { font-weight: 700; font-size: 16px; }
+    .t-deposit { color: #10ac84; }
+    .t-withdraw { color: #ee5253; }
+    
+    /* กล่องแสดงยอดคงเหลือรายคน */
+    .balance-box {
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center;
+      background: rgba(255,255,255,0.85); 
+      border-radius: 12px; 
+      padding: 10px 12px; 
+      margin-bottom: 9px;
+      border: 1px solid rgba(255,255,255,0.9);
+    }
+    .balance-name { 
+      font-weight: 600; 
+      color: #5a2e5d; 
+      white-space: nowrap; 
+      overflow: hidden; 
+      text-overflow: ellipsis; 
+      max-width: 130px; 
+      text-align: left;
+    }
+    @media (min-width: 768px) {
+      .balance-name {
+        max-width: none;
+        overflow: visible;
+      }
+    }
+    .balance-amount { 
+      font-size: 15px; 
+      font-weight: bold; 
+      color: #d63384; 
+      flex-grow: 1; 
+      text-align: right; 
+      margin: 0 10px;
+    }
+
+    #loader { 
+      display: none; 
+      text-align: center; 
+      font-weight: bold; 
+      color: white; 
+      margin-bottom: 12px; 
+      background: rgba(0,0,0,0.45); 
+      padding: 10px; 
+      border-radius: 12px;
+      font-size: 14px;
+    }
+    .action-row { display: flex; gap: 10px; margin-top: 5px; }
+
+    /* Modal Styling */
+    .modal {
+      display: none; 
+      position: fixed; 
+      z-index: 100; 
+      left: 0; 
+      top: 0;
+      width: 100%; 
+      height: 100%; 
+      background-color: rgba(0,0,0,0.45);
+      backdrop-filter: blur(5px); 
+      -webkit-backdrop-filter: blur(5px);
+      overflow-y: auto; 
+      padding: 20px 10px;
+    }
+    .modal-content {
+      background: rgba(255, 255, 255, 0.7); 
+      backdrop-filter: blur(20px); 
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 20px; 
+      border: 1px solid rgba(255,255,255,0.8);
+      margin: 10px auto; 
+      width: 100%; 
+      max-width: 450px; 
+      padding: 20px;
+      position: relative; 
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    .close-btn {
+      position: absolute; 
+      right: 15px; 
+      top: 15px; 
+      font-size: 28px; 
+      font-weight: bold;
+      color: #ff6b6b; 
+      cursor: pointer; 
+      line-height: 1;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  
+  <div class="header-bar">
+    <h1 class="header-title">💰 บันทึกรายรับ-รายจ่าย</h1>
+  </div>
+
+  <div id="loader">✨ กำลังโหลดข้อมูล...</div>
+
+  <!-- แถบเมนูสรุปยอดและประวัติ -->
+  <div class="action-row" style="margin-bottom: 14px;">
+    <button class="btn btn-secondary" onclick="openModal('balanceModal')">📊 เช็คยอดคงเหลือ</button>
+    <button class="btn btn-secondary" onclick="openModal('recentModal')">🕒 10 รายการล่าสุด</button>
+  </div>
+
+  <!-- ส่วนบันทึกรายการ (หน้าจอหลัก) -->
+  <div class="glass">
+    <h2>📝 บันทึกรายการเงิน</h2>
+
+    <!-- สรุปภาพรวมยอดเงินแบบเรียลไทม์ -->
+    <div class="summary-grid">
+      <div class="summary-card">
+        <div class="summary-label">รายรับรวม (ฝาก)</div>
+        <div class="summary-value val-income" id="dashTotalIncome">0 ฿</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">รายจ่ายรวม (ถอน)</div>
+        <div class="summary-value val-expense" id="dashTotalExpense">0 ฿</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">คงเหลือสุทธิ</div>
+        <div class="summary-value val-net" id="dashNetBalance">0 ฿</div>
+      </div>
+    </div>
+    
+    <!-- ช่องเลือกวันที่ พ.ศ. (แตะเลือกได้ทันที สะอาดตา) -->
+    <div class="form-group">
+      <label>📅 1. วันที่ทำรายการ (พ.ศ.)</label>
+      <div class="date-picker-wrap">
+        <input type="text" id="dateDisplay" readonly placeholder="วว/ดด/ปปปป" onclick="openDatePicker()" title="คลิกเพื่อเลือกวันที่" style="cursor:pointer; text-align:center; background:#ffffff; font-weight:600; color:#5a2e5d;">
+        <input type="date" id="dateRaw" onchange="onDateChange(this.value)">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>📁 2. เลือกหมวดหมู่</label>
+      <select id="categorySelect" onchange="updateStudentDropdown()"></select>
+    </div>
+    
+    <div class="form-group">
+      <label>👤 3. ชื่อผู้ทำรายการ / นักเรียน</label>
+      <select id="studentSelect">
+        <option value="">- กรุณาเลือกหมวดหมู่ก่อน -</option>
+      </select>
+    </div>
+    
+    <div class="form-group">
+      <label>💵 4. จำนวนเงิน (บาท)</label>
+      <input type="number" id="amountInput" inputmode="numeric" pattern="[0-9]*" placeholder="ระบุจำนวนเงิน" min="1">
+    </div>
+    
+    <div class="form-group">
+      <label>💬 5. หมายเหตุ (ถ้ามี)</label>
+      <input type="text" id="remarkInput" placeholder="เช่น ค่าอาหาร, เงินฝากประจำวัน, ซื้ออุปกรณ์">
+    </div>
+    
+    <div class="action-row">
+      <button class="btn btn-deposit" onclick="submitTransaction('ฝาก')">+ ฝากเงิน (รายรับ)</button>
+      <button class="btn btn-withdraw" onclick="submitTransaction('ถอน')">- ถอนเงิน (รายจ่าย)</button>
+    </div>
+  </div>
+
+  <!-- ส่วนจัดการฐานข้อมูล -->
+  <div class="glass">
+    <div class="action-row">
+      <button class="btn btn-secondary" onclick="promptAddCategory()">➕ เพิ่มหมวดหมู่</button>
+      <button class="btn btn-secondary" onclick="promptAddStudent()">👤 เพิ่มชื่อสมาชิก/นักเรียน</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- ================= MODALS ================= -->
+
+<!-- 1. Modal เช็คยอดคงเหลือ -->
+<div id="balanceModal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeModal('balanceModal')">&times;</span>
+    <h3>📊 เช็คยอดรายบุคคล</h3>
+    
+    <div class="form-group">
+      <label>เลือกหมวดหมู่ที่ต้องการดู:</label>
+      <select id="checkCategorySelect" onchange="renderBalanceList()">
+        <option value="">- เลือกหมวดหมู่ -</option>
+      </select>
+    </div>
+    
+    <div id="balanceListResult" style="margin-top:15px;">
+      <div style="text-align:center; color:#555;">กรุณาเลือกหมวดหมู่</div>
+    </div>
+  </div>
+</div>
+
+<!-- 2. Modal 10 รายการล่าสุด -->
+<div id="recentModal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeModal('recentModal')">&times;</span>
+    <h3>🕒 10 รายการล่าสุด</h3>
+    <div id="recentTransactionsResult"></div>
+  </div>
+</div>
+
+<!-- 3. Modal ประวัติรายบุคคล -->
+<div id="historyModal" class="modal" style="z-index: 105;">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeModal('historyModal')">&times;</span>
+    <h3 id="historyTitle" style="font-size:18px; margin-bottom:5px;">ประวัติ</h3>
+    <div style="text-align:center; color:#666; font-size:14px; margin-bottom:15px;" id="historySubtitle"></div>
+    <div id="historyListResult"></div>
+  </div>
+</div>
+
+<!-- ================= SCRIPTS ================= -->
+<script>
+  let globalStudents = [];
+  let globalBalances = {};
+  let globalCategories = [];
+  let globalRecent = [];
+
+  // ตั้งค่าวันที่เริ่มต้นเป็น วันปัจจุบัน (พ.ศ.)
+  window.onload = function() {
+    initDefaultDate();
+    showLoader(true);
+    google.script.run.withSuccessHandler(updateUI).getDashboardData();
+  };
+
+  // -------------------------------------------------------------
+  // ระบบจัดการวันที่ พ.ศ. (dd/mm/yyyy)
+  // -------------------------------------------------------------
+  function initDefaultDate() {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    
+    const isoDate = `${yyyy}-${mm}-${dd}`;
+    document.getElementById('dateRaw').value = isoDate;
+    updateDateDisplay(dd, mm, yyyy + 543);
+  }
+
+  function onDateChange(isoVal) {
+    if (!isoVal) return;
+    const parts = isoVal.split('-');
+    if (parts.length === 3) {
+      const yearBE = parseInt(parts[0], 10) + 543;
+      updateDateDisplay(parts[2], parts[1], yearBE);
+    }
+  }
+
+  function updateDateDisplay(dd, mm, yyyyBE) {
+    document.getElementById('dateDisplay').value = `${dd}/${mm}/${yyyyBE}`;
+  }
+
+  function openDatePicker() {
+    const rawPicker = document.getElementById('dateRaw');
+    if (rawPicker.showPicker) {
+      try { rawPicker.showPicker(); } catch (e) { rawPicker.focus(); }
+    } else {
+      rawPicker.focus();
+    }
+  }
+
+  function showLoader(show) {
+    document.getElementById('loader').style.display = show ? 'block' : 'none';
+  }
+
+  function openModal(id) { document.getElementById(id).style.display = 'block'; }
+  function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+  // -------------------------------------------------------------
+  // อัปเดต UI จากข้อมูล Backend
+  // -------------------------------------------------------------
+  function updateUI(data) {
+    showLoader(false);
+    
+    globalStudents = data.students || [];
+    globalBalances = data.balances || {};
+    globalCategories = data.categories || [];
+    globalRecent = data.recent || [];
+
+    // อัปเดตการ์ดยอดรวมภาพรวม
+    const totalIncome = Number(data.totalIncome) || 0;
+    const totalExpense = Number(data.totalExpense) || 0;
+    const netBalance = Number(data.netBalance) || (totalIncome - totalExpense);
+    
+    document.getElementById('dashTotalIncome').innerText = totalIncome.toLocaleString() + ' ฿';
+    document.getElementById('dashTotalExpense').innerText = totalExpense.toLocaleString() + ' ฿';
+    document.getElementById('dashNetBalance').innerText = netBalance.toLocaleString() + ' ฿';
+
+    const oldCat = document.getElementById('categorySelect').value;
+    const oldStudent = document.getElementById('studentSelect').value;
+    const oldCheckCat = document.getElementById('checkCategorySelect').value;
+
+    let categoryHtml = '<option value="">- เลือกหมวดหมู่ -</option>';
+    data.categories.forEach(c => categoryHtml += `<option value="${c}">${c}</option>`);
+    
+    document.getElementById('categorySelect').innerHTML = categoryHtml;
+    document.getElementById('checkCategorySelect').innerHTML = categoryHtml;
+
+    if (oldCat) document.getElementById('categorySelect').value = oldCat;
+    updateStudentDropdown();
+    if (oldStudent) document.getElementById('studentSelect').value = oldStudent;
+    
+    if (oldCheckCat) {
+      document.getElementById('checkCategorySelect').value = oldCheckCat;
+      renderBalanceList(); 
+    }
+
+    // เรนเดอร์ 10 รายการล่าสุด
+    let recentHtml = '';
+    if (!data.recent || data.recent.length === 0) {
+      recentHtml = '<div style="text-align:center; color:#666; padding:15px;">ยังไม่มีรายการบันทึก</div>';
+    } else {
+      data.recent.forEach(r => {
+        const isDeposit = (r.type === 'ฝาก' || r.type === 'รายรับ');
+        const colorClass = isDeposit ? 't-deposit' : 't-withdraw';
+        const sign = isDeposit ? '+' : '-';
+        recentHtml += `
+          <div class="transaction-item">
+            <div class="t-info">
+              <strong>${r.student}</strong> (${r.category})<br>
+              <span style="color:#666; font-size:11.5px;">${r.time} | ${r.remark || '-'}</span>
+            </div>
+            <div style="text-align:right;">
+              <div class="t-amount ${colorClass}">${sign}${Number(r.amount).toLocaleString()} ฿</div>
+              <button class="btn btn-danger" onclick="deleteItem('${r.id}')">ลบ</button>
+            </div>
+          </div>`;
+      });
+    }
+    document.getElementById('recentTransactionsResult').innerHTML = recentHtml;
+  }
+
+  function updateStudentDropdown() {
+    const selectedCat = document.getElementById('categorySelect').value;
+    const studentSelect = document.getElementById('studentSelect');
+    let studentHtml = '<option value="">- เลือกชื่อผู้ทำรายการ -</option>';
+    
+    if (selectedCat) {
+      const filtered = globalStudents.filter(s => s.category === selectedCat);
+      filtered.forEach(s => studentHtml += `<option value="${s.name}">${s.name}</option>`);
+    } else {
+      studentHtml = '<option value="">- กรุณาเลือกหมวดหมู่ก่อน -</option>';
+    }
+    studentSelect.innerHTML = studentHtml;
+  }
+
+  function renderBalanceList() {
+    const cat = document.getElementById('checkCategorySelect').value;
+    const resultDiv = document.getElementById('balanceListResult');
+    
+    if (!cat) {
+      resultDiv.innerHTML = '<div style="text-align:center; color:#555;">กรุณาเลือกหมวดหมู่</div>';
+      return;
+    }
+
+    const studentsInCat = globalStudents.filter(s => s.category === cat);
+    if (studentsInCat.length === 0) {
+      resultDiv.innerHTML = '<div style="text-align:center; color:#555;">ไม่มีรายชื่อในหมวดหมู่นี้</div>';
+      return;
+    }
+
+    let html = '';
+    studentsInCat.forEach(s => {
+      const balKey = `${s.name} (${cat})`;
+      const bal = globalBalances[balKey] || 0;
+      html += `
+        <div class="balance-box">
+          <div class="balance-name" title="${s.name}">${s.name}</div>
+          <div class="balance-amount">${bal.toLocaleString()} ฿</div>
+          <button class="btn btn-small" onclick="viewHistory('${s.name}', '${cat}')">📄 ประวัติ</button>
+        </div>`;
+    });
+    resultDiv.innerHTML = html;
+  }
+
+  function viewHistory(studentName, category) {
+    document.getElementById('historyTitle').innerText = studentName;
+    document.getElementById('historySubtitle').innerText = `หมวดหมู่: ${category}`;
+    document.getElementById('historyListResult').innerHTML = '<div style="text-align:center; padding:15px;">กำลังโหลด...</div>';
+    
+    openModal('historyModal');
+
+    google.script.run.withSuccessHandler(history => {
+      let html = '';
+      if (!history || history.length === 0) {
+        html = '<div style="text-align:center; color:#666; padding:15px;">ไม่พบประวัติการทำรายการ</div>';
+      } else {
+        history.forEach(r => {
+          const isDeposit = (r.type === 'ฝาก' || r.type === 'รายรับ');
+          const colorClass = isDeposit ? 't-deposit' : 't-withdraw';
+          const sign = isDeposit ? '+' : '-';
+          html += `
+            <div class="transaction-item">
+              <div class="t-info">
+                <strong>${r.type}</strong> (${Number(r.amount).toLocaleString()} ฿)<br>
+                <span style="color:#666; font-size:11.5px;">${r.time} | ${r.remark || '-'}</span>
+              </div>
+              <div style="text-align:right;">
+                <div class="t-amount ${colorClass}">${sign}${Number(r.amount).toLocaleString()} ฿</div>
+                <button class="btn btn-danger" onclick="deleteItem('${r.id}', true)">ลบ</button>
+              </div>
+            </div>`;
+        });
+      }
+      document.getElementById('historyListResult').innerHTML = html;
+    }).getStudentHistory(studentName, category);
+  }
+
+  function submitTransaction(type) {
+    const category = document.getElementById('categorySelect').value;
+    const student = document.getElementById('studentSelect').value;
+    const amount = document.getElementById('amountInput').value;
+    const remark = document.getElementById('remarkInput').value;
+    const chosenDate = document.getElementById('dateRaw').value; // YYYY-MM-DD
+
+    if (!category || !student || !amount || Number(amount) <= 0) {
+      alert('⚠️ กรุณากรอกข้อมูลให้ครบถ้วน และจำนวนเงินต้องมากกว่า 0');
+      return;
+    }
+
+    showLoader(true);
+    google.script.run.withSuccessHandler(res => {
+      updateUI(res);
+      document.getElementById('amountInput').value = '';
+      document.getElementById('remarkInput').value = '';
+      alert(`✅ บันทึกรายการ ${type} สำเร็จ!`);
+    }).addTransaction(student, category, type, amount, remark, chosenDate);
+  }
+
+  function deleteItem(id, fromHistoryModal = false) {
+    if (confirm('❓ แน่ใจหรือไม่ว่าต้องการลบรายการนี้? (ระบบจะคำนวณยอดเงินใหม่ให้อัตโนมัติ)')) {
+      showLoader(true);
+      google.script.run.withSuccessHandler(res => {
+        updateUI(res);
+        if (fromHistoryModal) closeModal('historyModal'); 
+      }).deleteTransaction(id);
+    }
+  }
+
+  function promptAddStudent() {
+    const selectedCat = document.getElementById('categorySelect').value;
+    if (!selectedCat) {
+      alert('⚠️ กรุณาเลือก "หมวดหมู่" ที่ช่องด้านบนก่อน!');
+      return;
+    }
+    const name = prompt(`กรอกชื่อผู้ทำรายการ/นักเรียน ในหมวดหมู่ "${selectedCat}":`);
+    if (name && name.trim()) { 
+      showLoader(true); 
+      google.script.run.withSuccessHandler(updateUI).addStudent(name.trim(), selectedCat); 
+    }
+  }
+
+  function promptAddCategory() {
+    const cat = prompt("กรอกชื่อหมวดหมู่ที่ต้องการเพิ่ม:");
+    if (cat && cat.trim()) { 
+      showLoader(true); 
+      google.script.run.withSuccessHandler(updateUI).addCategory(cat.trim()); 
+    }
+  }
+
+  // PWA Service Worker Registration
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
+    });
+  }
+</script>
+</body>
+</html>
