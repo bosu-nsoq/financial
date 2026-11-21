@@ -416,11 +416,12 @@
     .balance-box {
       display: flex; justify-content: space-between; align-items: center;
       background: rgba(255,255,255,0.7); border-radius: 12px; 
-      padding: 8px 11px; margin-bottom: 7px;
+      padding: 9px 12px; margin-bottom: 7px;
       border: 1px solid rgba(255,255,255,0.85);
+      gap: 10px;
     }
     .balance-name { font-weight: 600; color: #5a2e5d; font-size: 13.5px; }
-    .balance-amount { font-size: 14px; font-weight: bold; color: #d63384; margin: 0 8px; }
+    .balance-amount { font-size: 14.5px; font-weight: bold; color: #d63384; margin: 0; text-align: right; }
 
     /* ================= PIN LOCK SCREEN ================= */
     #pinOverlay {
@@ -716,7 +717,7 @@
     <span class="close-btn" onclick="closeModal('historyModal')">&times;</span>
     <h3 id="historyTitle" style="font-size:17px; margin-bottom:4px;">ประวัติ</h3>
     <div style="text-align:center; color:#666; font-size:13px; margin-bottom:10px;" id="historySubtitle"></div>
-    <div id="historyListResult" style="max-height:300px; overflow-y:auto;"></div>
+    <div id="historyListResult" style="flex:1; overflow-y:auto; min-height:0; padding:2px;"></div>
   </div>
 </div>
 
@@ -1229,9 +1230,17 @@
       const bal = globalBalances[balKey] || 0;
       html += `
         <div class="balance-box">
-          <div class="balance-name">${s.name}</div>
-          <div class="balance-amount">${bal.toLocaleString()} ฿</div>
-          <button class="btn-icon-mini" onclick="viewHistory('${s.name}', '${checkSelectedCat}')" style="background:#e0f2fe; color:#0369a1; border:none; padding:3px 9px;">ประวัติ</button>
+          <div class="balance-name" style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+            👤 ${s.name}
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
+            <div class="balance-amount" style="text-align:right; min-width:70px; font-variant-numeric:tabular-nums;">
+              ${bal.toLocaleString()} ฿
+            </div>
+            <button type="button" class="btn-action-icon" onclick="viewHistory('${s.name}', '${checkSelectedCat}')" title="ประวัติการทำรายการ" style="background:#e0f2fe; color:#0369a1; border:none; padding:4px 8px; font-size:14px;">
+              🕒
+            </button>
+          </div>
         </div>`;
     });
     resultDiv.innerHTML = html;
@@ -1265,34 +1274,65 @@
   function viewHistory(studentName, category) {
     document.getElementById('historyTitle').innerText = studentName;
     document.getElementById('historySubtitle').innerText = `หมวดหมู่: ${category}`;
-    document.getElementById('historyListResult').innerHTML = '<div style="text-align:center; padding:10px;">กำลังโหลด...</div>';
     
+    // 1. ดึงประวัติจาก local transactions ทันที (0ms)
+    const localHist = globalRecent.filter(r => 
+      String(r.student).trim() === String(studentName).trim() && 
+      String(r.category).trim() === String(category).trim()
+    );
+
+    renderHistoryItems(localHist, true);
     openModal('historyModal');
 
-    google.script.run.withSuccessHandler(history => {
-      let html = '';
-      if (!history || history.length === 0) {
-        html = '<div style="text-align:center; color:#666; padding:12px;">ไม่พบประวัติการทำรายการ</div>';
+    // 2. ดึงประวัติรายการทั้งหมดจาก Google Sheets ผ่าน API
+    google.script.run
+      .withSuccessHandler(history => {
+        if (history && Array.isArray(history) && history.length > 0) {
+          renderHistoryItems(history, false);
+        } else if (localHist.length === 0) {
+          document.getElementById('historyListResult').innerHTML = 
+            '<div style="text-align:center; color:#666; padding:20px;">ไม่พบประวัติการทำรายการ</div>';
+        }
+      })
+      .withFailureHandler(err => {
+        console.warn("History fetch warning:", err);
+        if (localHist.length === 0) {
+          document.getElementById('historyListResult').innerHTML = 
+            '<div style="text-align:center; color:#666; padding:20px;">ไม่พบประวัติการทำรายการ</div>';
+        }
+      })
+      .getStudentHistory(studentName, category);
+  }
+
+  function renderHistoryItems(history, isLocalPreview) {
+    const listDiv = document.getElementById('historyListResult');
+    if (!history || history.length === 0) {
+      if (!isLocalPreview) {
+        listDiv.innerHTML = '<div style="text-align:center; color:#666; padding:20px;">ไม่พบประวัติการทำรายการ</div>';
       } else {
-        history.forEach(r => {
-          const isDeposit = (r.type === 'ฝาก' || r.type === 'รายรับ');
-          const colorClass = isDeposit ? 't-deposit' : 't-withdraw';
-          const sign = isDeposit ? '+' : '-';
-          html += `
-            <div class="transaction-item">
-              <div class="t-info">
-                <strong>${r.type}</strong> (${Number(r.amount).toLocaleString()} ฿)<br>
-                <span style="color:#666; font-size:11px;">${r.time} | ${r.remark || '-'}</span>
-              </div>
-              <div style="text-align:right;">
-                <div class="t-amount ${colorClass}">${sign}${Number(r.amount).toLocaleString()} ฿</div>
-                <button class="btn-icon-mini" onclick="deleteItem('${r.id}', true)" style="background:#fee2e2; color:#ef4444; border:none;">ลบ</button>
-              </div>
-            </div>`;
-        });
+        listDiv.innerHTML = '<div style="text-align:center; padding:15px; color:#777;">กำลังโหลดประวัติ...</div>';
       }
-      document.getElementById('historyListResult').innerHTML = html;
-    }).getStudentHistory(studentName, category);
+      return;
+    }
+
+    let html = '';
+    history.forEach(r => {
+      const isDeposit = (r.type === 'ฝาก' || r.type === 'รายรับ');
+      const colorClass = isDeposit ? 't-deposit' : 't-withdraw';
+      const sign = isDeposit ? '+' : '-';
+      html += `
+        <div class="transaction-item">
+          <div class="t-info">
+            <strong>${r.type}</strong> (${Number(r.amount).toLocaleString()} ฿)<br>
+            <span style="color:#666; font-size:11px;">${r.time} | ${r.remark || '-'}</span>
+          </div>
+          <div style="text-align:right;">
+            <div class="t-amount ${colorClass}">${sign}${Number(r.amount).toLocaleString()} ฿</div>
+            <button class="btn-icon-mini" onclick="deleteItem('${r.id}', true)" style="background:#fee2e2; color:#ef4444; border:none; margin-top:2px;">ลบ</button>
+          </div>
+        </div>`;
+    });
+    listDiv.innerHTML = html;
   }
 
   function submitTransaction(type) {
@@ -1771,7 +1811,7 @@
   // PWA Service Worker
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js?v=7').then(reg => {
+      navigator.serviceWorker.register('./sw.js?v=8').then(reg => {
         reg.update();
       }).catch(() => {});
     });
