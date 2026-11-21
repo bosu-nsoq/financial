@@ -40,6 +40,10 @@
   <!-- โหลดฟอนต์ Mali สำหรับ UI ระบบ และ Sarabun สำหรับพิมพ์เอกสารทางการ -->
   <link href="https://fonts.googleapis.com/css2?family=Mali:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
+  <!-- ไลบรารีสำหรับดาวน์โหลดรายงาน Excel (SheetJS) และ PDF (html2pdf.js) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  
   <style>
     * { 
       box-sizing: border-box; 
@@ -93,16 +97,17 @@
       gap: 8px;
     }
     .header-logo {
-      width: 32px;
-      height: 32px;
-      border-radius: 9px;
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.12);
     }
     .header-title {
       margin: 0;
       color: #d63384;
-      font-size: 19px;
+      font-size: clamp(21px, 5.8vw, 24px);
       font-weight: 700;
+      letter-spacing: -0.2px;
       text-shadow: 1px 1px 3px rgba(255,255,255,0.9);
       white-space: nowrap;
     }
@@ -476,6 +481,13 @@
         margin: auto;
         gap: 14px;
       }
+      .header-title {
+        font-size: 26px;
+      }
+      .header-logo {
+        width: 44px;
+        height: 44px;
+      }
       .glass {
         padding: 24px 22px;
         border-radius: 24px;
@@ -696,17 +708,26 @@
     
     <div id="balanceListResult" style="flex:1; overflow-y:auto; margin-top:4px; padding-right:2px; min-height:0;"></div>
 
-    <button class="btn" onclick="printCategoryStats()" style="margin-top:10px; background:#4facfe; color:white; font-size:13.5px; padding:10px; flex-shrink:0;">
-      🖨️ พิมพ์รายงานสถิติ
-    </button>
+    <!-- ปุ่มพิมพ์รายงาน / โหลด PDF / โหลด Excel -->
+    <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:6px; margin-top:10px; flex-shrink:0;">
+      <button class="btn" onclick="printCategoryStats()" style="background:#4facfe; color:white; font-size:12.5px; padding:9px 4px; border-radius:12px; font-weight:600;">
+        🖨️ พิมพ์
+      </button>
+      <button class="btn" onclick="downloadCategoryPDF()" style="background:#ff7675; color:white; font-size:12.5px; padding:9px 4px; border-radius:12px; font-weight:600;">
+        📄 โหลด PDF
+      </button>
+      <button class="btn" onclick="downloadCategoryExcel()" style="background:#00b894; color:white; font-size:12.5px; padding:9px 4px; border-radius:12px; font-weight:600;">
+        📊 โหลด Excel
+      </button>
+    </div>
   </div>
 </div>
 
-<!-- 2. Modal 10 รายการล่าสุด -->
+<!-- 2. Modal รายการล่าสุด -->
 <div id="recentModal" class="modal" style="z-index: 100;">
   <div class="modal-content">
     <span class="close-btn" onclick="closeModal('recentModal')">&times;</span>
-    <h3 style="margin-bottom:8px;">🕒 10 รายการล่าสุด</h3>
+    <h3 style="margin-bottom:8px;">🕒 รายการล่าสุด</h3>
     <div id="recentTransactionsResult" style="flex:1; overflow-y:auto; padding-right:2px; min-height:0;"></div>
   </div>
 </div>
@@ -1377,7 +1398,7 @@
       amount: numAmount,
       remark: remark || ''
     });
-    globalRecent = globalRecent.slice(0, 10);
+    globalRecent = globalRecent.slice(0, 200);
 
     saveLocalState();
     updateUI({
@@ -1808,10 +1829,153 @@
     printArea.style.display = 'none';
   }
 
+  // ดาวน์โหลดรายงานเป็นไฟล์ PDF (Sarabun Font 100%)
+  function downloadCategoryPDF() {
+    if (!checkSelectedCat) {
+      alert("กรุณาเลือกหมวดหมู่ก่อนดาวน์โหลด PDF");
+      return;
+    }
+
+    const studentsInCat = globalStudents.filter(s => s.category === checkSelectedCat);
+    const dateText = document.getElementById('dateDisplay').value;
+    let totalCatBalance = 0;
+
+    let rowsHtml = '';
+    studentsInCat.forEach((s, idx) => {
+      const balKey = `${s.name} (${checkSelectedCat})`;
+      const bal = globalBalances[balKey] || 0;
+      totalCatBalance += bal;
+      rowsHtml += `
+        <tr>
+          <td style="border:1px solid #333; padding:8px; text-align:center; font-family:'Sarabun', sans-serif;">${idx + 1}</td>
+          <td style="border:1px solid #333; padding:8px; font-family:'Sarabun', sans-serif;">${s.name}</td>
+          <td style="border:1px solid #333; padding:8px; text-align:right; font-family:'Sarabun', sans-serif;">${bal.toLocaleString()} บาท</td>
+        </tr>`;
+    });
+
+    const reportHtml = `
+      <div style="font-family:'Sarabun', sans-serif !important; padding:20px; color:#000; background:#fff;">
+        <h2 style="text-align:center; margin:0 0 5px 0; font-family:'Sarabun', sans-serif; font-size:22px; font-weight:700;">รายงานสถิติยอดเงินคงเหลือ</h2>
+        <h3 style="text-align:center; margin:0 0 15px 0; font-weight:normal; font-family:'Sarabun', sans-serif; font-size:16px;">หมวดหมู่: <strong>${checkSelectedCat}</strong> | ข้อมูล ณ วันที่: ${dateText}</h3>
+        <table style="width:100%; border-collapse:collapse; margin-bottom:15px; font-size:14px; font-family:'Sarabun', sans-serif;">
+          <thead>
+            <tr style="background:#f2f2f2;">
+              <th style="border:1px solid #333; padding:8px; width:60px; font-family:'Sarabun', sans-serif;">ลำดับ</th>
+              <th style="border:1px solid #333; padding:8px; text-align:left; font-family:'Sarabun', sans-serif;">ชื่อผู้ทำรายการ</th>
+              <th style="border:1px solid #333; padding:8px; text-align:right; width:160px; font-family:'Sarabun', sans-serif;">ยอดเงินคงเหลือ</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rowsHtml || '<tr><td colspan="3" style="text-align:center; padding:10px; font-family:\'Sarabun\', sans-serif;">ไม่มีข้อมูล</td></tr>'}
+          </tbody>
+          <tfoot>
+            <tr style="font-weight:bold; background:#fafafa;">
+              <td colspan="2" style="border:1px solid #333; padding:8px; text-align:right; font-family:'Sarabun', sans-serif;">ยอดเงินรวมทั้งสิ้น:</td>
+              <td style="border:1px solid #333; padding:8px; text-align:right; font-family:'Sarabun', sans-serif;">${totalCatBalance.toLocaleString()} บาท</td>
+            </tr>
+          </tfoot>
+        </table>
+        <div style="text-align:right; font-size:13px; margin-top:35px; font-family:'Sarabun', sans-serif;">
+          <p style="margin:4px 0;">ลงชื่อ .............................................................. ผู้จัดทำรายงาน</p>
+          <p style="margin:4px 0;">วันที่พิมพ์: ${dateText}</p>
+        </div>
+      </div>
+    `;
+
+    const fileName = `รายงานยอดเงิน_${checkSelectedCat.replace(/\s+/g, '_')}_${dateText.replace(/\//g, '-')}.pdf`;
+
+    if (typeof html2pdf !== 'undefined') {
+      const wrapper = document.createElement('div');
+      wrapper.style.position = 'fixed';
+      wrapper.style.left = '-9999px';
+      wrapper.style.top = '0';
+      wrapper.style.width = '750px';
+      wrapper.innerHTML = reportHtml;
+      document.body.appendChild(wrapper);
+
+      const opt = {
+        margin:       10,
+        filename:     fileName,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true, letterRendering: true },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      html2pdf().set(opt).from(wrapper).save().then(() => {
+        if (wrapper.parentNode) document.body.removeChild(wrapper);
+      }).catch(err => {
+        console.warn("html2pdf failed, falling back to window.print()", err);
+        if (wrapper.parentNode) document.body.removeChild(wrapper);
+        printCategoryStats();
+      });
+    } else {
+      printCategoryStats();
+    }
+  }
+
+  // ดาวน์โหลดรายงานเป็นไฟล์ Excel (.xlsx หรือ UTF-8 BOM CSV)
+  function downloadCategoryExcel() {
+    if (!checkSelectedCat) {
+      alert("กรุณาเลือกหมวดหมู่ก่อนดาวน์โหลด Excel");
+      return;
+    }
+
+    const studentsInCat = globalStudents.filter(s => s.category === checkSelectedCat);
+    const dateText = document.getElementById('dateDisplay').value;
+    let totalCatBalance = 0;
+
+    const wsData = [
+      ["รายงานสถิติยอดเงินคงเหลือ"],
+      [`หมวดหมู่: ${checkSelectedCat}`, `ข้อมูล ณ วันที่: ${dateText}`],
+      [],
+      ["ลำดับ", "ชื่อผู้ทำรายการ", "หมวดหมู่", "ยอดเงินคงเหลือ (บาท)"]
+    ];
+
+    studentsInCat.forEach((s, idx) => {
+      const balKey = `${s.name} (${checkSelectedCat})`;
+      const bal = globalBalances[balKey] || 0;
+      totalCatBalance += bal;
+      wsData.push([idx + 1, s.name, checkSelectedCat, bal]);
+    });
+
+    wsData.push([]);
+    wsData.push(["ยอดเงินรวมทั้งสิ้น", "", "", totalCatBalance]);
+
+    const baseName = `รายงานยอดเงิน_${checkSelectedCat.replace(/\s+/g, '_')}_${dateText.replace(/\//g, '-')}`;
+
+    if (typeof XLSX !== 'undefined') {
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.aoa_to_sheet(wsData);
+
+      ws['!cols'] = [
+        { wch: 8 },
+        { wch: 25 },
+        { wch: 20 },
+        { wch: 22 }
+      ];
+
+      XLSX.utils.book_append_sheet(wb, ws, "ยอดเงินคงเหลือ");
+      XLSX.writeFile(wb, `${baseName}.xlsx`);
+    } else {
+      // Fallback: UTF-8 with BOM CSV
+      let csvContent = "\uFEFF";
+      wsData.forEach(row => {
+        csvContent += row.map(v => `"${String(v !== undefined ? v : '').replace(/"/g, '""')}"`).join(",") + "\r\n";
+      });
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `${baseName}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  }
+
   // PWA Service Worker
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js?v=8').then(reg => {
+      navigator.serviceWorker.register('./sw.js?v=9').then(reg => {
         reg.update();
       }).catch(() => {});
     });

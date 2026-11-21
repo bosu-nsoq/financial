@@ -207,7 +207,7 @@ function getDashboardData() {
   
   // เรียงลำดับรายการล่าสุดจากใหม่ไปเก่า (ตาม ID timestamp)
   recentTransactions.sort((a, b) => Number(b.id) - Number(a.id));
-  recentTransactions = recentTransactions.slice(0, 10);
+  recentTransactions = recentTransactions.slice(0, 200);
   
   return {
     students: students,
