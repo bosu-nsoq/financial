@@ -300,6 +300,10 @@
       border-radius: 10px;
       font-size: 12px;
     }
+    @keyframes spinBounce {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+    }
 
     /* Modals แบบกระจกแก้วโปร่งแสง (Glass Popups) ขนาดใหญ่เต็มจอ สะดวกสบาย */
     .modal {
@@ -617,14 +621,14 @@
     <div class="form-group">
       <div class="field-header">
         <label>👤 ผู้ทำรายการ</label>
-        <span id="personBalanceDisplay" class="balance-tag" style="display:none;"></span>
       </div>
       <div class="glass-selector" onclick="openPersonModal()">
-        <div style="display:flex; align-items:center; gap:8px;">
-          <span style="font-size:15px;">👤</span>
-          <span id="selectedPersonDisplay" style="font-weight:600; color:#5a2e5d;">- เลือกผู้ทำรายการ -</span>
+        <div style="display:flex; align-items:center; gap:8px; overflow:hidden; flex:1; min-width:0;">
+          <span style="font-size:15px; flex-shrink:0;">👤</span>
+          <span id="selectedPersonDisplay" style="font-weight:600; color:#5a2e5d; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">- เลือกผู้ทำรายการ -</span>
+          <span id="personBalanceDisplay" class="balance-tag" style="display:none; white-space:nowrap; flex-shrink:0;"></span>
         </div>
-        <span style="font-size:12px; color:#d63384; font-weight:600;">▼</span>
+        <span style="font-size:12px; color:#d63384; font-weight:600; flex-shrink:0; margin-left:6px;">▼</span>
       </div>
     </div>
     
@@ -653,10 +657,6 @@
     <button class="dock-btn" onclick="openModal('recentModal')">
       <span class="dock-icon">🕒</span>
       <span class="dock-label">ล่าสุด</span>
-    </button>
-    <button class="dock-btn" onclick="lockScreen()">
-      <span class="dock-icon">🔒</span>
-      <span class="dock-label">ล็อค PIN</span>
     </button>
   </div>
 
@@ -738,6 +738,15 @@
   </div>
 </div>
 
+<!-- 4. หน้าจอโหลดขณะลบและจัดการข้อมูลสำคัญ -->
+<div id="actionLoaderOverlay" style="display:none; position:fixed; z-index:9999; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); align-items:center; justify-content:center; flex-direction:column;">
+  <div style="background:rgba(255,255,255,0.92); border:1.5px solid rgba(255,255,255,0.9); padding:24px 28px; border-radius:24px; box-shadow:0 12px 40px rgba(0,0,0,0.2); text-align:center; max-width:85%; width:320px;">
+    <div style="font-size:38px; margin-bottom:8px; animation:spinBounce 1.4s infinite ease-in-out;">⏳</div>
+    <div id="actionLoaderText" style="font-size:15px; font-weight:700; color:#d63384; margin-bottom:4px;">กำลังจัดการข้อมูล...</div>
+    <div style="font-size:12px; color:#666;">ระบบกำลังบันทึกและจัดการข้อมูล กรุณารอสักครู่</div>
+  </div>
+</div>
+
 <!-- ================= SCRIPTS ================= -->
 <script>
   // ข้อมูลตั้งต้นจริงจาก Google Sheets
@@ -773,14 +782,18 @@
   };
 
   // ==========================================
-  // 1. PIN LOCK SYSTEM
+  // 1. PIN LOCK SYSTEM (PIN เริ่มต้น: 8055)
   // ==========================================
   let currentEnteredPin = "";
-  const PIN_STORAGE_KEY = 'financial_app_pin_v1';
+  const PIN_STORAGE_KEY = 'financial_app_pin_v2';
   const UNLOCKED_KEY = 'financial_app_unlocked';
 
+  if (localStorage.getItem('financial_app_pin_v1')) {
+    localStorage.removeItem('financial_app_pin_v1');
+  }
+
   function getSavedPin() {
-    return localStorage.getItem(PIN_STORAGE_KEY) || "1234";
+    return localStorage.getItem(PIN_STORAGE_KEY) || "8055";
   }
 
   function checkLockState() {
@@ -1017,6 +1030,16 @@
 
   function showLoader(show) {
     document.getElementById('loader').style.display = show ? 'block' : 'none';
+  }
+
+  function showActionLoader(show, text) {
+    const el = document.getElementById('actionLoaderOverlay');
+    if (!el) return;
+    if (text) {
+      const txtEl = document.getElementById('actionLoaderText');
+      if (txtEl) txtEl.innerText = text;
+    }
+    el.style.display = show ? 'flex' : 'none';
   }
 
   function openModal(id) { 
@@ -1567,6 +1590,12 @@
       return;
     }
 
+    // ปิดป๊อปอัพเลือกหมวดหมู่ทันที ไม่ให้เด้งกลับมาซ้ำซ้อน
+    closeModal('categoryModal');
+
+    // แสดงหน้าจอโหลดขณะลบ เพื่อให้เวลาระบบประมวลผลจัดการข้อมูลให้เรียบร้อย
+    showActionLoader(true, `🗑️ กำลังลบหมวดหมู่ "${cat}"...`);
+
     globalCategories = globalCategories.filter(c => c !== cat);
     globalStudents = globalStudents.filter(s => s.category !== cat);
 
@@ -1584,7 +1613,7 @@
       selectedStudent = filtered.length > 0 ? filtered[0].name : "";
     }
     if (checkSelectedCat === cat) {
-      checkSelectedCat = globalCategories[0] || "";
+      checkSelectedCat = selectedCategory || globalCategories[0] || "";
     }
 
     saveLocalState();
@@ -1594,21 +1623,20 @@
       balances: globalBalances,
       recent: globalRecent
     });
-    openCategoryModal();
 
-    showLoader(true);
     google.script.run
       .withSuccessHandler(res => {
-        showLoader(false);
+        showActionLoader(false);
         if (res && res.categories) {
           localStorage.setItem(CACHE_KEY, JSON.stringify(res));
           updateUI(res);
-          openCategoryModal();
         }
+        alert(`✅ ลบหมวดหมู่ "${cat}" เรียบร้อยแล้ว`);
       })
       .withFailureHandler(err => {
-        showLoader(false);
+        showActionLoader(false);
         console.warn("GAS warning:", err);
+        alert(`✅ ลบหมวดหมู่ "${cat}" เรียบร้อยแล้ว`);
       })
       .deleteCategory(cat);
   }
@@ -1725,6 +1753,8 @@
       return;
     }
 
+    showActionLoader(true, `🗑️ กำลังลบผู้ทำรายการ "${name}"...`);
+
     globalStudents = globalStudents.filter(s => !(s.name === name && s.category === selectedCategory));
     delete globalBalances[`${name} (${selectedCategory})`];
 
@@ -1745,10 +1775,9 @@
     const sInput = document.getElementById('personSearchInput');
     filterPersonList(sInput ? sInput.value : '');
 
-    showLoader(true);
     google.script.run
       .withSuccessHandler(res => {
-        showLoader(false);
+        showActionLoader(false);
         if (res && res.students) {
           localStorage.setItem(CACHE_KEY, JSON.stringify(res));
           updateUI(res);
@@ -1757,7 +1786,7 @@
         }
       })
       .withFailureHandler(err => {
-        showLoader(false);
+        showActionLoader(false);
         console.warn("GAS warning:", err);
       })
       .deleteStudent(name, selectedCategory);
@@ -1887,7 +1916,7 @@
   // PWA Service Worker
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js?v=10').then(reg => {
+      navigator.serviceWorker.register('./sw.js?v=11').then(reg => {
         reg.update();
       }).catch(() => {});
     });
