@@ -12,7 +12,7 @@
   <meta name="description" content="ระบบบันทึกการใช้เงิน">
   <meta property="og:title" content="Financial">
   <meta property="og:description" content="ระบบบันทึกการใช้เงิน">
-  <meta property="og:image" content="https://i.postimg.cc/T2Cngdnd/Financial.png">
+  <meta property="og:image" content="https://bosu-nsoq.github.io/financial/Financial.png">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://bosu-nsoq.github.io/financial/">
 
@@ -20,11 +20,11 @@
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="Financial">
   <meta name="twitter:description" content="ระบบบันทึกการใช้เงิน">
-  <meta name="twitter:image" content="https://i.postimg.cc/T2Cngdnd/Financial.png">
+  <meta name="twitter:image" content="https://bosu-nsoq.github.io/financial/Financial.png">
 
   <!-- Favicon (ไอคอนบน Tab) -->
-  <link rel="icon" type="image/png" href="https://i.postimg.cc/T2Cngdnd/Financial.png">
-  <link rel="shortcut icon" type="image/png" href="https://i.postimg.cc/T2Cngdnd/Financial.png">
+  <link rel="icon" type="image/png" href="Financial.png">
+  <link rel="shortcut icon" type="image/png" href="Financial.png">
 
   <!-- PWA & Apple iOS Standalone App Meta Tags -->
   <link rel="manifest" href="manifest.json">
@@ -32,10 +32,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="บันทึกการใช้เงิน">
-  <link rel="apple-touch-icon" href="https://i.postimg.cc/T2Cngdnd/Financial.png">
-  <link rel="apple-touch-icon" sizes="152x152" href="https://i.postimg.cc/T2Cngdnd/Financial.png">
-  <link rel="apple-touch-icon" sizes="167x167" href="https://i.postimg.cc/T2Cngdnd/Financial.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="https://i.postimg.cc/T2Cngdnd/Financial.png">
+  <link rel="apple-touch-icon" href="Financial.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="Financial.png">
+  <link rel="apple-touch-icon" sizes="167x167" href="Financial.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="Financial.png">
 
   <!-- โหลดฟอนต์ Mali สำหรับ UI ระบบ และ Sarabun สำหรับพิมพ์เอกสารทางการ -->
   <link href="https://fonts.googleapis.com/css2?family=Mali:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -553,7 +553,7 @@
 <!-- ================= PIN LOCK OVERLAY ================= -->
 <div id="pinOverlay">
   <div class="pin-card">
-    <img src="https://i.postimg.cc/T2Cngdnd/Financial.png" alt="logo" style="width:64px; height:64px; border-radius:16px; margin-bottom:8px; box-shadow:0 4px 10px rgba(0,0,0,0.1);">
+    <img src="Financial.png" onerror="this.onerror=null; this.src='https://bosu-nsoq.github.io/financial/Financial.png';" alt="logo" style="width:64px; height:64px; border-radius:16px; margin-bottom:8px; box-shadow:0 4px 10px rgba(0,0,0,0.1);">
     <h3 style="margin:0 0 4px 0; color:#d63384; font-size:18px;">ระบบบันทึกการใช้เงิน</h3>
     <p id="pinMsg" style="margin:0 0 16px 0; color:#666; font-size:13px;">กรุณากรอกรหัส PIN 4 หลัก</p>
     
@@ -586,7 +586,7 @@
   <!-- Header Bar -->
   <div class="header-bar">
     <div class="header-brand">
-      <img src="https://i.postimg.cc/T2Cngdnd/Financial.png" alt="logo" class="header-logo">
+      <img src="Financial.png" onerror="this.onerror=null; this.src='https://bosu-nsoq.github.io/financial/Financial.png';" alt="logo" class="header-logo">
       <h1 class="header-title">ระบบบันทึกการใช้เงิน</h1>
     </div>
   </div>
@@ -1918,7 +1918,7 @@
   // PWA Service Worker
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js?v=12').then(reg => {
+      navigator.serviceWorker.register('./sw.js?v=13').then(reg => {
         reg.update();
       }).catch(() => {});
     });

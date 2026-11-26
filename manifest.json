@@ -10,13 +10,13 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "https://i.postimg.cc/T2Cngdnd/Financial.png",
+      "src": "Financial.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "https://i.postimg.cc/T2Cngdnd/Financial.png",
+      "src": "Financial.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
